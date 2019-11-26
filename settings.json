@@ -1,0 +1,9 @@
+{
+	"port": "8182",
+	"web_dir": "web",
+	"storage_dir": "storage",
+	"events_storage_file": "events.db",
+	"users_storage_file": "users.db",
+	"events_photos_dir": "events_photos",
+	"users_photos_dir": "users_photos"
+}

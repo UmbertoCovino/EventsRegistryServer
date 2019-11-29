@@ -16,10 +16,15 @@ import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.MapVerifier;
+import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 import com.google.gson.Gson;
 
 import commons.InvalidUserEmailException;
 import server.web.resources.json.EventsRegistrySizeJSON;
+import server.backend.TelegramBot;
 import server.backend.wrapper.EventsRegistryAPI;
 import server.backend.wrapper.UsersRegistryAPI;
 import server.web.resources.json.EventJSON;
@@ -219,6 +224,22 @@ public class EventsRegistryWebApplication extends Application {
 		} catch (Exception e) {	// Something is wrong
 			e.printStackTrace();
 		}
+		
+		// Launch TelegramBot --------------------------
+		// Initialize Api Context
+        ApiContextInitializer.init();
+
+        // Instantiate Telegram Bots API
+        TelegramBotsApi botsApi = new TelegramBotsApi();
+
+        // Register our bot
+        try {
+            botsApi.registerBot(new TelegramBot());
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+        
+        System.err.println();
 	}
 
 	private static boolean createDirectoryIfNotExists(String directoryPath) {

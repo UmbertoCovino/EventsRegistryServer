@@ -31,7 +31,7 @@ public class UserPhotoJSON extends ServerResource {
 		try {
 			User user = urapi.get(getAttribute("email"));
 			
-			Path path = Paths.get(urapi.getPhotosDirectory() + user.getPhoto());
+			Path path = Paths.get(urapi.getPhotosDirectory() + user.getPhotoPath());
 			
 			if (!new File(path.toString()).exists())
 				//return gson.toJson("There is no photo for user with email " + getAttribute("email") + ".", String.class);
@@ -64,7 +64,7 @@ public class UserPhotoJSON extends ServerResource {
 			User user = urapi.get(getAttribute("email"));
 			
 			try {
-				entity.write(new FileOutputStream(new File(urapi.getPhotosDirectory() + user.getPhoto())));
+				entity.write(new FileOutputStream(new File(urapi.getPhotosDirectory() + user.getPhotoPath())));
 			} catch (Exception e) {
 				throw new ResourceException(e);
 			}

@@ -9,24 +9,25 @@ import com.google.gson.Gson;
 
 import commons.ErrorCodes;
 import commons.Event;
+import commons.GenericSQLException;
 import commons.InvalidEventIdException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
 import commons.User;
-import server.backend.wrapper.EventsRegistryAPI;
-import server.backend.wrapper.UsersRegistryAPI;
+import commons.VoidClassFieldException;
+import server.backend.EventsAccessObject;
+import server.backend.UsersAccessObject;
 
-public class EventUserJSON extends ServerResource {
+public class EventUserOwnerJSON extends ServerResource {
 	
 	@Get
     public String getUser() throws InvalidUserEmailException {
 		Gson gson = new Gson();
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
 		
 		try {
-			Event event = erapi.get(getAttribute("id"));
+			Event event = EventsAccessObject.getEvent(Integer.valueOf(getAttribute("id")));
 			
-			return gson.toJson(UsersRegistryAPI.instance().get(event.getUserEmail()).cloneWithoutPassword(), User.class);   	
+			return gson.toJson(UsersAccessObject.getUser(event.getOwnerEmail()).cloneWithoutPassword(), User.class);   	
 		} catch (InvalidEventIdException e) {
 			Status status = new Status(ErrorCodes.INVALID_EVENT_ID);
 			setStatus(status);
@@ -38,16 +39,15 @@ public class EventUserJSON extends ServerResource {
     @Put
     public String updateUser(String payload) {
 		Gson gson = new Gson();
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
 		
 		try {
-			Event event = erapi.get(getAttribute("id"));
+			Event event = EventsAccessObject.getEvent(Integer.valueOf(getAttribute("id")));
 			
-			if (!getClientInfo().getUser().getIdentifier().equals(event.getUserEmail()))
+			if (!getClientInfo().getUser().getIdentifier().equals(event.getOwnerEmail()))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			event.setUser(gson.fromJson(payload, User.class));
-			erapi.update(event);
+			event.setOwner(gson.fromJson(payload, User.class));
+			EventsAccessObject.updateEvent(event);
 			
 			return gson.toJson("User updated for event with id " + getAttribute("id") + ".", String.class);
 		} catch (InvalidEventIdException e) {
@@ -60,6 +60,16 @@ public class EventUserJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
 	}
 }

@@ -39,7 +39,7 @@ public class UsersRegistryJSON extends ServerResource {
 		
 		User user = gson.fromJson(payload, User.class);
 		try {
-			user.setPhoto(user.getEmail() + ".jpg");
+			user.setPhotoPath(user.getEmail() + ".jpg");
 			
 			urapi.add(user);
 			

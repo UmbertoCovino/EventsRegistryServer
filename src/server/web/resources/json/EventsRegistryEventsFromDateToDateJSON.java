@@ -27,18 +27,18 @@ public class EventsRegistryEventsFromDateToDateJSON extends ServerResource {
 		String[] ids = erapi.ids();
 		ArrayList<Event> events = new ArrayList<Event>();
 		
-		Date fromDate = Event.DATETIME_SIMPLE_DATE_FORMAT.parse(getAttribute("from"));
-		Date toDate = Event.DATETIME_SIMPLE_DATE_FORMAT.parse(getAttribute("to"));
+		Date fromDate = Event.DATETIME_SDF.parse(getAttribute("from"));
+		Date toDate = Event.DATETIME_SDF.parse(getAttribute("to"));
 		
 		for (int i = 0; i < ids.length; i++) {
 			Event event = erapi.get(ids[i]).clone();
 			
-			Date eventStartDate = Event.DATETIME_SIMPLE_DATE_FORMAT.parse(Event.DATE_SIMPLE_DATE_FORMAT.format(event.getDate()) + "-" + Event.TIME_SIMPLE_DATE_FORMAT.format(event.getStartTime()));
-			Date eventEndDate = Event.DATETIME_SIMPLE_DATE_FORMAT.parse(Event.DATE_SIMPLE_DATE_FORMAT.format(event.getDate()) + "-" + Event.TIME_SIMPLE_DATE_FORMAT.format(event.getEndTime()));
+			Date eventStartDate = Event.DATETIME_SDF.parse(Event.DATE_SDF.format(event.getDate()) + "-" + Event.TIME_SDF.format(event.getStartTime()));
+			Date eventEndDate = Event.DATETIME_SDF.parse(Event.DATE_SDF.format(event.getDate()) + "-" + Event.TIME_SDF.format(event.getEndTime()));
 			
 			if ((eventEndDate.after(fromDate) || eventEndDate.equals(fromDate)) && (eventStartDate.before(toDate) || eventStartDate.equals(toDate))) {
 				events.add(event);
-				event.setUser(UsersRegistryAPI.instance().get(event.getUserEmail()).cloneWithoutPassword());
+				event.setOwner(UsersRegistryAPI.instance().get(event.getUserEmail()).cloneWithoutPassword());
 			}
 		}
 		

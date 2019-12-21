@@ -17,21 +17,24 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 
 import commons.ErrorCodes;
-import commons.Event;
+import commons.GenericSQLException;
 import commons.InvalidEventIdException;
 import commons.UnauthorizedUserException;
-import server.backend.wrapper.EventsRegistryAPI;
+import server.backend.EventsAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventPhotoJSON extends ServerResource {
 	
 	@Get
     public Representation getPhoto() throws ResourceException {
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
+		@SuppressWarnings("unused")
+		Gson gson = new Gson();
 		
 		try {
-			Event event = erapi.get(getAttribute("id"));
+    			int id = Integer.valueOf(getAttribute("id"));
+			String photoPath = EventsAccessObject.getEventPhotoPath(id);
 			
-			Path path = Paths.get(erapi.getPhotosDirectory() + event.getPhoto());
+			Path path = Paths.get(EventsRegistryWebApplication.EVENTS_PHOTOS_DIRECTORY + photoPath);
 			
 			if (!new File(path.toString()).exists())
 //				return gson.toJson("There is no photo for event with id " + getAttribute("id") + ".", String.class);
@@ -49,22 +52,30 @@ public class EventPhotoJSON extends ServerResource {
 			
 //			return gson.toJson(e, InvalidEventIdException.class);
 			return null;
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+//			return gson.toJson(e, GenericSQLException.class);
+			return null;
 		}
     }
     
     @Put
     public String updatePhoto(Representation entity) throws ResourceException {
 		Gson gson = new Gson();
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
+		int id = Integer.valueOf(getAttribute("id"));
 		
 		try {
-			Event event = erapi.get(getAttribute("id"));
+			String ownerEmail = EventsAccessObject.getEventOwnerEmail(id);
 			
-			if (!getClientInfo().getUser().getIdentifier().equals(event.getUser().getEmail()))
+			if (!getClientInfo().getUser().getIdentifier().equals(ownerEmail))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
+			String photoPath = EventsAccessObject.getEventPhotoPath(id);
+			
 			try {
-				entity.write(new FileOutputStream(new File(erapi.getPhotosDirectory() + event.getPhoto())));
+				entity.write(new FileOutputStream(new File(EventsRegistryWebApplication.EVENTS_PHOTOS_DIRECTORY + photoPath)));
 			} catch (Exception e) {
 				throw new ResourceException(e);
 			}
@@ -81,6 +92,12 @@ public class EventPhotoJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+//			return gson.toJson(e, GenericSQLException.class);
+			return null;
 		}
 	}
 }

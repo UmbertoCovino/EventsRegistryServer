@@ -4,12 +4,19 @@ import java.io.Serializable;
 
 public class User implements Serializable {
 	private static final long serialVersionUID = -2926305862149034310L;
-	private String name, surname, email, password, photo;
+	private String name, surname, email, password, photoPath;
 
-	public User(String name, String surname, String email, String password) {
+	
+	public User(String name, String surname, String email, String photoPath) {
 		this.name = name;
 		this.surname = surname;
 		this.email = email;
+		this.password = null;
+		this.photoPath = photoPath;
+	}
+	
+	public User(String name, String surname, String email, String password, String photoPath) {
+		this(name, surname, email, photoPath);
 		this.password = password;
 	}
 
@@ -45,18 +52,18 @@ public class User implements Serializable {
 		this.password = password;
 	}
 
-	public String getPhoto() {
-		return photo;
+	public String getPhotoPath() {
+		return photoPath;
 	}
 
-	public void setPhoto(String photo) {
-		this.photo = photo;
+	public void setPhotoPath(String photoPath) {
+		this.photoPath = photoPath;
 	}
 
-//	@Override
-//	public String toString() {
-//		return "User [name=" + name + ", surname=" + surname + ", email=" + email + ", password=" + password + ", photo=" + photo + "]";
-//	}
+	@Override
+	public String toString() {
+		return "User [name=" + name + ", surname=" + surname + ", email=" + email + ", password=" + password + ", photoPath=" + photoPath + "]";
+	}
 	
 /*	Questo metodo serve nei seguenti metodi delle seguenti classi per evitare che il client riceva oggetti User contenenti
  * 	le password valide per accedere al sistema:
@@ -68,8 +75,7 @@ public class User implements Serializable {
  * 		UserJSON				getUser()
  */
 	public User cloneWithoutPassword() {
-		User user = new User(name, surname, email, "");
-		user.setPhoto(photo);
+		User user = new User(name, surname, email, photoPath);
 		
 		return user;
 	}

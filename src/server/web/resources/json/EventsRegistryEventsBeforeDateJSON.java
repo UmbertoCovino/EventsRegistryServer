@@ -27,16 +27,16 @@ public class EventsRegistryEventsBeforeDateJSON extends ServerResource {
 		String[] ids = erapi.ids();
 		ArrayList<Event> events = new ArrayList<Event>();
 		
-		Date toDate = Event.DATETIME_SIMPLE_DATE_FORMAT.parse(getAttribute("date"));
+		Date toDate = Event.DATETIME_SDF.parse(getAttribute("date"));
 		
 		for (int i = 0; i < ids.length; i++) {
 			Event event = erapi.get(ids[i]).clone();
 			
-			Date eventEndDate = Event.DATETIME_SIMPLE_DATE_FORMAT.parse(Event.DATE_SIMPLE_DATE_FORMAT.format(event.getDate()) + "-" + Event.TIME_SIMPLE_DATE_FORMAT.format(event.getEndTime()));
+			Date eventEndDate = Event.DATETIME_SDF.parse(Event.DATE_SDF.format(event.getDate()) + "-" + Event.TIME_SDF.format(event.getEndTime()));
 			
 			if (eventEndDate.before(toDate)) {
 				events.add(event);
-				event.setUser(UsersRegistryAPI.instance().get(event.getUserEmail()).cloneWithoutPassword());
+				event.setOwner(UsersRegistryAPI.instance().get(event.getUserEmail()).cloneWithoutPassword());
 			}
 		}
 		

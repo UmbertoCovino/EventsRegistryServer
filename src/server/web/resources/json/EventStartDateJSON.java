@@ -1,33 +1,32 @@
 package server.web.resources.json;
 
-import java.io.File;
 import java.text.ParseException;
+import java.util.Date;
 
 import org.restlet.data.Status;
-import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
 
-import commons.Event;
-import commons.GenericSQLException;
 import commons.ErrorCodes;
+import commons.GenericSQLException;
 import commons.InvalidEventIdException;
 import commons.UnauthorizedUserException;
+import commons.VoidClassFieldException;
 import server.backend.EventsAccessObject;
-import server.web.frontend.EventsRegistryWebApplication;
 
-public class EventJSON extends ServerResource {
+public class EventStartDateJSON extends ServerResource {
 	
-    @Get
-    public String getEvent() throws ParseException {   	
+	@Get
+    public String getStartDate() throws ParseException {
 		Gson gson = new Gson();
 		
 		try {
-			Event event = EventsAccessObject.getEvent(Integer.parseInt(getAttribute("id"))).clone();
-			
-			return gson.toJson(event, Event.class);
+			Date startDate = EventsAccessObject.getEventStartDate(Integer.valueOf(getAttribute("id")));
+		
+			return gson.toJson(startDate, Date.class);
 		} catch (InvalidEventIdException e) {
 			Status status = new Status(ErrorCodes.INVALID_EVENT_ID);
 			setStatus(status);
@@ -41,10 +40,10 @@ public class EventJSON extends ServerResource {
 		}
     }
     
-    @Delete
-    public String deleteEvent(){
-    		Gson gson = new Gson();
-    		int id = Integer.valueOf(getAttribute("id"));
+    @Put
+    public String updateStartDate(String payload) {
+		Gson gson = new Gson();
+		int id = Integer.valueOf(getAttribute("id"));
 		
 		try {
 			String ownerEmail = EventsAccessObject.getEventOwnerEmail(id);
@@ -52,14 +51,11 @@ public class EventJSON extends ServerResource {
 			if (!getClientInfo().getUser().getIdentifier().equals(ownerEmail))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			String photoPath = EventsAccessObject.getEventPhotoPath(id);
+			Date startDate = gson.fromJson(payload, Date.class);
 			
-			new File(EventsRegistryWebApplication.EVENTS_PHOTOS_DIRECTORY + "/" + photoPath).delete();
+			EventsAccessObject.updateEventStartDate(id, startDate);
 			
-			EventsAccessObject.removeEvent(Integer.parseInt(getAttribute("id")));
-			
-//			return gson.toJson("Event with id " + getAttribute("id") + " removed.", String.class);
-			return gson.toJson(true, boolean.class);
+			return gson.toJson("Start date updated for event with id " + id + ".", String.class);
 		} catch (InvalidEventIdException e) {
 			Status status = new Status(ErrorCodes.INVALID_EVENT_ID);
 			setStatus(status);
@@ -70,11 +66,16 @@ public class EventJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);
 			
 			return gson.toJson(e, GenericSQLException.class);
 		}
-    }
+	}
 }

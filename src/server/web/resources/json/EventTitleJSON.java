@@ -10,20 +10,21 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 
 import commons.Event;
+import commons.GenericSQLException;
 import commons.ErrorCodes;
 import commons.InvalidEventIdException;
 import commons.UnauthorizedUserException;
-import server.backend.wrapper.EventsRegistryAPI;
+import commons.VoidClassFieldException;
+import server.backend.EventsAccessObject;
 
 public class EventTitleJSON extends ServerResource {
 	
     @Get
     public String getTitle() throws ParseException {
 		Gson gson = new Gson();
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
 		
 		try {
-			Event event = erapi.get(getAttribute("id"));
+			Event event = EventsAccessObject.getEvent(Integer.valueOf(getAttribute("id")));
 		
 			return gson.toJson(event.getTitle(), String.class);   	
 		} catch (InvalidEventIdException e) {
@@ -37,16 +38,15 @@ public class EventTitleJSON extends ServerResource {
     @Put
     public String updateTitle(String payload) {
 		Gson gson = new Gson();
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
 		
 		try {
-			Event event = erapi.get(getAttribute("id"));
+			Event event = EventsAccessObject.getEvent(Integer.valueOf(getAttribute("id")));
 			
-			if (!getClientInfo().getUser().getIdentifier().equals(event.getUserEmail()))
+			if (!getClientInfo().getUser().getIdentifier().equals(event.getOwnerEmail()))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
 			event.setTitle(gson.fromJson(payload, String.class));
-			erapi.update(event);
+			EventsAccessObject.updateEvent(event);
 			
 			return gson.toJson("Title updated for event with id " + getAttribute("id") + ".", String.class);
 		} catch (InvalidEventIdException e) {
@@ -59,6 +59,16 @@ public class EventTitleJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
 	}
 }

@@ -1,9 +1,7 @@
 package server.web.resources.json;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.UUID;
+import java.util.ArrayList;
 
 import org.restlet.data.Status;
 import org.restlet.resource.Get;
@@ -14,76 +12,75 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 
 import commons.Event;
+import commons.GenericSQLException;
 import commons.ErrorCodes;
 import commons.InvalidEventIdException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
-import server.backend.wrapper.EventsRegistryAPI;
-import server.backend.wrapper.UsersRegistryAPI;
+import commons.VoidClassFieldException;
+import server.backend.EventsAccessObject;
 
 public class EventsRegistryJSON extends ServerResource {
 	
 	@Get
-	public String getEvents() throws ParseException, InvalidEventIdException, InvalidUserEmailException {   	
+	public String getEvents() throws ParseException {   	
 		Gson gson = new Gson();
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
 		
-		String[] ids = erapi.ids();
-		Event[] events = new Event[ids.length];
-		
-		for (int i = 0; i < ids.length; i++) {
-			events[i] = erapi.get(ids[i]).clone();
-			events[i].setUser(UsersRegistryAPI.instance().get(events[i].getUserEmail()).cloneWithoutPassword());
+		ArrayList<Event> events = null;
+		try {
+			events = EventsAccessObject.getEventsOrderedByStartDateAsc();
+		} catch (GenericSQLException e) {
+			e.printStackTrace();
 		}
 		
-		Arrays.sort(events, new Comparator<Event>() {
-			@Override
-			public int compare(Event o1, Event o2) {
-				return o1.getDate().compareTo(o2.getDate());
-			}
-	    });
-		
-		return gson.toJson(events, Event[].class);
+		return gson.toJson(events.toArray(new Event[events.size()]), Event[].class);
 	}
     
     @Post
     public String addEvent(String payload) throws ParseException, InvalidUserEmailException {   	
 		Gson gson = new Gson();
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
 		
 		Event event = gson.fromJson(payload, Event.class);
 		try {
-			String uniqueID = UUID.randomUUID().toString();
-			event.setId(uniqueID);
-			event.setPhoto(uniqueID + ".jpg");
-			event.setUserEmail(getClientInfo().getUser().getIdentifier());
+			event.setOwnerEmail(getClientInfo().getUser().getIdentifier());
 			
-			event.setDate(Event.DATETIME_SIMPLE_DATE_FORMAT.parse(Event.DATE_SIMPLE_DATE_FORMAT.format(event.getDate()) + "-" + Event.TIME_SIMPLE_DATE_FORMAT.format(event.getStartTime())));
+			int lastInsertedId = EventsAccessObject.addEvent(event);
 			
-			erapi.add(event);
+			String photoPath = lastInsertedId + ".jpg";
+			
+			EventsAccessObject.updateEventPhotoPath(lastInsertedId, photoPath);
 			
 //			return gson.toJson("Event with id " + event.getId() + " added.", String.class);
-			return gson.toJson(event.getId(), String.class);
+			return gson.toJson(lastInsertedId, String.class);
 //			return gson.toJson(event, Event.class);
-		} catch (InvalidEventIdException e) {    		
+		} catch (InvalidEventIdException e) {
 			Status status = new Status(ErrorCodes.INVALID_EVENT_ID);
 			setStatus(status);
 			
 			return gson.toJson(e, InvalidEventIdException.class);
-		}    		
+		}  catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
+		}
     }
     
     @Put
     public String updateEvent(String payload) throws ParseException, InvalidEventIdException {
 		Gson gson = new Gson();
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
 		
 		Event event = gson.fromJson(payload, Event.class);
 		try {
-			if (!getClientInfo().getUser().getIdentifier().equals(event.getUserEmail()))
+			if (!getClientInfo().getUser().getIdentifier().equals(event.getOwnerEmail()))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			erapi.update(event);
+			EventsAccessObject.updateEvent(event);
 			
 			return gson.toJson(true, boolean.class);
 //			return gson.toJson("Event with id " + event.getId() + " updated.", String.class);
@@ -92,6 +89,16 @@ public class EventsRegistryJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
     }
     

@@ -3,6 +3,9 @@ package server.web.frontend;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.sql.ResultSet;
+import java.util.Date;
+
 import org.restlet.Application;
 import org.restlet.Component;
 import org.restlet.Request;
@@ -22,19 +25,21 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.google.gson.Gson;
 
+import commons.Event;
 import commons.InvalidUserEmailException;
+import commons.User;
 import server.web.resources.json.EventsRegistrySizeJSON;
+import server.backend.DBManager;
+import server.backend.EventsAccessObject;
 import server.backend.TelegramBot;
-import server.backend.wrapper.EventsRegistryAPI;
-import server.backend.wrapper.UsersRegistryAPI;
+import server.backend.UsersAccessObject;
 import server.web.resources.json.EventJSON;
 import server.web.resources.json.EventPhotoJSON;
-import server.web.resources.json.EventStartTimeJSON;
-import server.web.resources.json.EventDateJSON;
+import server.web.resources.json.EventStartDateJSON;
 import server.web.resources.json.EventDescriptionJSON;
-import server.web.resources.json.EventEndTimeJSON;
+import server.web.resources.json.EventEndDateJSON;
 import server.web.resources.json.EventTitleJSON;
-import server.web.resources.json.EventUserJSON;
+import server.web.resources.json.EventUserOwnerJSON;
 import server.web.resources.json.EventsRegistryEventsAfterDateJSON;
 import server.web.resources.json.EventsRegistryEventsBeforeDateJSON;
 import server.web.resources.json.EventsRegistryJSON;
@@ -49,17 +54,41 @@ import server.web.resources.json.UsersRegistryJSON;
 import server.web.resources.json.UsersRegistrySizeJSON;
 
 public class EventsRegistryWebApplication extends Application {
-	private static String rootDirForWebStaticFiles;
+	public static String STORAGE_DIRECTORY,
+						EVENTS_PHOTOS_DIRECTORY,
+						USERS_PHOTOS_DIRECTORY;
+	
+	private static String ROOT_DIR_FOR_WEB_STATIC_FILES;
+	
 	private MapVerifier verifier; 
 	
 	private class Settings {
 		public int port;
-		public String web_dir;
-		public String storage_dir;
-		public String events_storage_file;
-		public String users_storage_file;
-		public String events_photos_dir;
-		public String users_photos_dir;
+		public String webDir;
+		public String storageDir;
+		public String eventsPhotosDir;
+		public String usersPhotosDir;
+		public String dbName;
+		public String dbUser;
+		public String dbPassword;
+		
+		public boolean hasSomeVoidField() {
+			return port != 0
+				   && webDir != null
+				   && storageDir != null
+				   && eventsPhotosDir != null
+				   && usersPhotosDir != null
+				   && dbName != null
+				   && dbUser != null
+				   && dbPassword != null
+				   && !webDir.equals("")
+				   && !storageDir.equals("")
+				   && !eventsPhotosDir.equals("")
+				   && !usersPhotosDir.equals("")
+				   && !dbName.equals("")
+				   && !dbUser.equals("")
+				   && !dbPassword.equals("");
+		}
 	}
 		
     /**
@@ -70,19 +99,19 @@ public class EventsRegistryWebApplication extends Application {
 		// Create a router Restlet that routes each call to a new instance appropriate ServerResource.
 		Router router = new Router(getContext());
 		
-		Directory webStaticFilesDirectory = new Directory(getContext(), rootDirForWebStaticFiles);
+		Directory webStaticFilesDirectory = new Directory(getContext(), ROOT_DIR_FOR_WEB_STATIC_FILES);
 		webStaticFilesDirectory.setListingAllowed(true);
 		webStaticFilesDirectory.setDeeplyAccessible(true);
 		
 		verifier = new MapVerifier();
 		
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
-		for (String email: urapi.emails())
-			try {
-				verifier.getLocalSecrets().put(email, urapi.get(email).getPassword().toCharArray());
-			} catch (InvalidUserEmailException e) {
-				e.printStackTrace();
-			}
+		// TODO restore this part
+//		for (String email: UsersAccessObject.getUsersEmails())
+//			try {
+//				verifier.getLocalSecrets().put(email, UsersAccessObject.getUser(email).getPassword().toCharArray());
+//			} catch (InvalidUserEmailException e) {
+//				e.printStackTrace();
+//			}
 			
 		getContext().setDefaultVerifier(verifier);
 		
@@ -96,12 +125,11 @@ public class EventsRegistryWebApplication extends Application {
 		router.attach("/eventsRegistry/events/between/{from}/{to}", EventsRegistryEventsFromDateToDateJSON.class);
 		router.attach("/eventsRegistry/events/{id}", getGuardExcludingGet(EventJSON.class));						// not used
 		router.attach("/eventsRegistry/events/{id}/title", getGuardExcludingGet(EventTitleJSON.class));				// not used
-		router.attach("/eventsRegistry/events/{id}/date", getGuardExcludingGet(EventDateJSON.class));				// not used
-		router.attach("/eventsRegistry/events/{id}/startTime", getGuardExcludingGet(EventStartTimeJSON.class));		// not used
-		router.attach("/eventsRegistry/events/{id}/endTime", getGuardExcludingGet(EventEndTimeJSON.class));			// not used
+		router.attach("/eventsRegistry/events/{id}/startDate", getGuardExcludingGet(EventStartDateJSON.class));		// not used
+		router.attach("/eventsRegistry/events/{id}/endDate", getGuardExcludingGet(EventEndDateJSON.class));			// not used
 		router.attach("/eventsRegistry/events/{id}/description", getGuardExcludingGet(EventDescriptionJSON.class));	// not used
 		router.attach("/eventsRegistry/events/{id}/photo", getGuardExcludingGet(EventPhotoJSON.class));
-		router.attach("/eventsRegistry/events/{id}/user", getGuardExcludingGet(EventUserJSON.class));				// not used
+		router.attach("/eventsRegistry/events/{id}/userOwner", getGuardExcludingGet(EventUserOwnerJSON.class));				// not used
 		
 		router.attach("/eventsRegistry/users", getGuardExcludingGetAndPost(UsersRegistryJSON.class));
 		router.attach("/eventsRegistry/users/size", UsersRegistrySizeJSON.class);									// not used
@@ -181,30 +209,32 @@ public class EventsRegistryWebApplication extends Application {
 			settings = gson.fromJson(br, Settings.class);
 			br.close();
 			
-			System.err.println("Settings were loaded from file.");
+			System.err.println("Settings were loaded from file.\n");
 		} catch (Exception e) {
 			System.err.println("Settings file not found!");
 			System.exit(-1);
 		}
 		
-		rootDirForWebStaticFiles = "file:" + File.separator + File.separator + System.getProperty("user.dir") + File.separator + settings.web_dir;
-		System.err.println("Web directory: " + rootDirForWebStaticFiles);
+		if (settings.hasSomeVoidField()) {
+			System.err.println("Settings have some void field! Please, fill all fields.");
+			System.exit(-1);
+		}
 		
-		String storageDirectory = System.getProperty("user.dir") + File.separator + settings.storage_dir + File.separator;
-		String eventsPhotosDirectory  = storageDirectory + settings.events_photos_dir + File.separator;
-		String usersPhotosDirectory  = storageDirectory + settings.users_photos_dir + File.separator;
 		
-		createDirectoryIfNotExists(storageDirectory);
-		createDirectoryIfNotExists(eventsPhotosDirectory);
-		createDirectoryIfNotExists(usersPhotosDirectory);
+		ROOT_DIR_FOR_WEB_STATIC_FILES = "file:" + File.separator + File.separator + System.getProperty("user.dir") + File.separator + settings.webDir;
+		System.err.println("Web directory: " + ROOT_DIR_FOR_WEB_STATIC_FILES + "\n");
 		
-		EventsRegistryAPI erapi = EventsRegistryAPI.instance();
-		erapi.setStorageFiles(storageDirectory, settings.events_storage_file, eventsPhotosDirectory);
-		erapi.restore();
+		STORAGE_DIRECTORY = System.getProperty("user.dir") + File.separator + settings.storageDir + File.separator;
+		EVENTS_PHOTOS_DIRECTORY  = STORAGE_DIRECTORY + settings.eventsPhotosDir + File.separator;
+		USERS_PHOTOS_DIRECTORY  = STORAGE_DIRECTORY + settings.usersPhotosDir + File.separator;
 		
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
-		urapi.setStorageFiles(storageDirectory, settings.users_storage_file, usersPhotosDirectory);
-		urapi.restore();
+		createDirectoryIfNotExists(STORAGE_DIRECTORY);
+		createDirectoryIfNotExists(EVENTS_PHOTOS_DIRECTORY);
+		createDirectoryIfNotExists(USERS_PHOTOS_DIRECTORY);
+		
+		DBManager.DB_NAME = settings.dbName;
+		DBManager.DB_USER = settings.dbUser;
+		DBManager.DB_PASSWORD = settings.dbPassword;
 		
 		try {
 			// Create a new Component
@@ -225,21 +255,69 @@ public class EventsRegistryWebApplication extends Application {
 			e.printStackTrace();
 		}
 		
+		
 		// Launch TelegramBot --------------------------
-		// Initialize Api Context
-        ApiContextInitializer.init();
-
-        // Instantiate Telegram Bots API
-        TelegramBotsApi botsApi = new TelegramBotsApi();
-
-        // Register our bot
-        try {
-            botsApi.registerBot(new TelegramBot());
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+//		// Initialize Api Context
+//        ApiContextInitializer.init();
+//
+//        // Instantiate Telegram Bots API
+//        TelegramBotsApi botsApi = new TelegramBotsApi();
+//
+//        // Register our bot
+//        try {
+//            botsApi.registerBot(new TelegramBot());
+//        } catch (TelegramApiException e) {
+//            e.printStackTrace();
+//        }
+		// End TelegramBot ------------------------------
         
+		
         System.err.println();
+        
+        
+        // testing method
+        //eventualTestingPart();
+	}
+
+	private static void eventualTestingPart() {
+		try {
+//			EventsAccessObject.addEvent(new Event("provaT", new Date(), new Date(), "provaD", "path", "email"));
+//			EventsAccessObject.addEvent(new Event("provaT2", new Date(), new Date(), "provaD2", "path", "email"));
+//
+//			EventsAccessObject.updateEvent(new Event(1, "provaTMod", new Date(), new Date(), "provaDMod"));
+
+//			EventsAccessObject.removeEvent(5);
+//			
+//			System.out.println(EventsAccessObject.getEvent(1));
+//	
+//			System.out.println(EventsAccessObject.getEvents());
+//			System.out.println(EventsAccessObject.getNumberOfEvents());
+			
+			
+			
+			
+			// da testare
+//			UsersAccessObject.addUser(new User("name4", "surname4", "email5", "pass5", "path4"));
+//			UsersAccessObject.addUser(new User("name2", "surname2", "email2", "pass2", "path"));
+
+			// da testare 
+//			UsersAccessObject.updateUser(new User("nameMod", "surnameMod", "email", "WW", "pathMod"));
+
+			// da testare
+//			UsersAccessObject.removeUser("email");
+			
+//			System.out.println(UsersAccessObject.getUser("email2"));
+	
+//			System.out.println(UsersAccessObject.getUsers());
+//			System.out.println(UsersAccessObject.getNumberOfUsers());
+			
+			
+			
+//			System.exit(-1);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private static boolean createDirectoryIfNotExists(String directoryPath) {

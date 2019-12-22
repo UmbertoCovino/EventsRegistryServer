@@ -11,10 +11,10 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 
 import commons.Event;
-import commons.GenericSQLException;
-import commons.ErrorCodes;
-import commons.InvalidEventIdException;
-import commons.UnauthorizedUserException;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
+import exceptions.InvalidEventIdException;
+import exceptions.UnauthorizedUserException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 

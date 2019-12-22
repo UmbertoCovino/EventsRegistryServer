@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import commons.Event;
-import commons.GenericSQLException;
-import commons.InvalidEventIdException;
-import commons.InvalidUserEmailException;
 import commons.User;
-import commons.VoidClassFieldException;
+import exceptions.GenericSQLException;
+import exceptions.InvalidEventIdException;
+import exceptions.InvalidUserEmailException;
+import exceptions.VoidClassFieldException;
 
 public class EventsAccessObject {
 	public static final SimpleDateFormat DATETIME_SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -199,6 +199,8 @@ public class EventsAccessObject {
 					owner = UsersAccessObject.getUser(ownerEmail);
 				} catch (InvalidUserEmailException e) {
 					owner = null;
+				} catch (VoidClassFieldException e) {
+					owner = null;
 				}
 			} else
 				throw new InvalidEventIdException("Inexistent event id: " + id);
@@ -248,8 +250,11 @@ public class EventsAccessObject {
 		return events;
 	}
 
-	public static ArrayList<Event> getEventsAfterDate(Date date) throws GenericSQLException {
+	public static ArrayList<Event> getEventsAfterDate(Date date) throws GenericSQLException, VoidClassFieldException {
 		ArrayList<Event> events = new ArrayList<>();
+		
+		if (date == null)
+			throw new VoidClassFieldException("The date passed cannot be null.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select id, title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
@@ -286,8 +291,11 @@ public class EventsAccessObject {
 		return events;
 	}
 
-	public static ArrayList<Event> getEventsBeforeDate(Date date) throws GenericSQLException {
+	public static ArrayList<Event> getEventsBeforeDate(Date date) throws GenericSQLException, VoidClassFieldException {
 		ArrayList<Event> events = new ArrayList<>();
+		
+		if (date == null)
+			throw new VoidClassFieldException("The date passed cannot be null.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select id, title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
@@ -324,8 +332,13 @@ public class EventsAccessObject {
 		return events;
 	}
 
-	public static ArrayList<Event> getEventsBetweenTwoDates(Date fromDate, Date toDate) throws GenericSQLException {
+	public static ArrayList<Event> getEventsBetweenTwoDates(Date fromDate, Date toDate) throws GenericSQLException, VoidClassFieldException {
 		ArrayList<Event> events = new ArrayList<>();
+		
+		if (fromDate == null)
+			throw new VoidClassFieldException("The first date passed cannot be null.");
+		else if (toDate == null)
+			throw new VoidClassFieldException("The second date passed cannot be null.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select id, title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
@@ -369,15 +382,15 @@ public class EventsAccessObject {
 	public synchronized static int addEvent(Event event) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
 		
-		if (event.getId() == null && event.getOwnerEmail() == null) {
-			if (event.getId() == null)
-				throw new VoidClassFieldException("The event passed does not have the id. Set it before calling this method.");
-			else
-				throw new VoidClassFieldException("The event passed does not have the owner email. Set it before calling this method.");
-		} else if (event.getTitle() == null && event.getStartDate() == null
-				&& event.getEndDate() == null && event.getDescription() == null
-				&& event.getOwnerEmail() == null) {
-			throw new VoidClassFieldException("The event passed does not have some field. Set them before calling this method.");
+		if (event.getId() == null)
+			throw new VoidClassFieldException("INTERNAL SERVER ERROR. The event passed does not have the id. Set it before calling this method.");
+		else if (event.getOwnerEmail() == null)
+			throw new VoidClassFieldException("INTERNAL SERVER ERROR. The event passed does not have the owner email. Set it before calling this method.");
+		else if (event.getTitle() == null || event.getTitle().equals("")
+			  || event.getStartDate() == null
+		      || event.getEndDate() == null
+		      || event.getDescription() == null || event.getDescription().equals("")) {
+			throw new VoidClassFieldException("The event passed have one or some fields null or empty. Set them before calling this method.");
 		}
 		
 		try {
@@ -422,8 +435,13 @@ public class EventsAccessObject {
 	public synchronized static int updateEvent(Event event) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
 		
-		if (event.getId() == null) {
-			throw new VoidClassFieldException("The event passed does not have the id. Set it before calling this method.");
+		if (event.getId() == null)
+			throw new VoidClassFieldException("INTERNAL SERVER ERROR. The event passed does not have the id. Set it before calling this method.");
+		else if (event.getTitle() == null || event.getTitle().equals("")
+			  || event.getStartDate() == null
+		      || event.getEndDate() == null
+		      || event.getDescription() == null || event.getDescription().equals("")) {
+			throw new VoidClassFieldException("The event passed have one or some fields null or empty. Set them before calling this method.");
 		}
 		
 		try {
@@ -455,6 +473,9 @@ public class EventsAccessObject {
 	public synchronized static int updateEventTitle(int id, String title) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
 		
+		if (title == null || title.equals(""))
+			throw new VoidClassFieldException("The title passed cannot be null or empty.");
+		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
 			
@@ -479,6 +500,9 @@ public class EventsAccessObject {
 	public synchronized static int updateEventStartDate(int id, Date startDate) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
 		
+		if (startDate == null)
+			throw new VoidClassFieldException("The start date passed cannot be null.");
+		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
 			
@@ -502,6 +526,9 @@ public class EventsAccessObject {
 	
 	public synchronized static int updateEventEndDate(int id, Date endDate) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
+
+		if (endDate == null)
+			throw new VoidClassFieldException("The end date passed cannot be null.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
@@ -526,6 +553,9 @@ public class EventsAccessObject {
 	
 	public synchronized static int updateEventDescription(int id, String description) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
+
+		if (description == null || description.equals(""))
+			throw new VoidClassFieldException("The description passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
@@ -550,6 +580,9 @@ public class EventsAccessObject {
 	
 	public synchronized static int updateEventPhotoPath(int id, String photoPath) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
+
+		if (photoPath == null || photoPath.equals(""))
+			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
@@ -574,6 +607,9 @@ public class EventsAccessObject {
 	
 	public synchronized static int updateEventOwnerEmail(int id, String ownerEmail) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
+		
+		if (ownerEmail == null || ownerEmail.equals(""))
+			throw new VoidClassFieldException("The owner email passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");

@@ -10,14 +10,16 @@ import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import commons.Event;
-import commons.GenericSQLException;
-import commons.ErrorCodes;
-import commons.InvalidEventIdException;
-import commons.InvalidUserEmailException;
-import commons.UnauthorizedUserException;
-import commons.VoidClassFieldException;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
+import exceptions.InvalidEventIdException;
+import exceptions.InvalidUserEmailException;
+import exceptions.JsonParsingException;
+import exceptions.UnauthorizedUserException;
+import exceptions.VoidClassFieldException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
@@ -44,7 +46,16 @@ public class EventsJSON extends ServerResource {
     public String addEvent(String payload) throws ParseException, InvalidUserEmailException {   	
     		Gson gson = EventsRegistryWebApplication.GSON;
 		
-		Event event = gson.fromJson(payload, Event.class);
+		Event event;
+		try {
+			event = gson.fromJson(payload, Event.class);
+		} catch (JsonSyntaxException e) {
+			Status status = new Status(ErrorCodes.JSON_PARSING);
+			setStatus(status);
+			
+			return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
+		}
+		
 		try {
 			event.setOwnerEmail(getClientInfo().getUser().getIdentifier());
 			
@@ -62,7 +73,7 @@ public class EventsJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, InvalidEventIdException.class);
-		}  catch (VoidClassFieldException e) {
+		} catch (VoidClassFieldException e) {
 			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
 			setStatus(status);
 			
@@ -78,8 +89,17 @@ public class EventsJSON extends ServerResource {
     @Put
     public String updateEvent(String payload) throws ParseException, InvalidEventIdException {
     		Gson gson = EventsRegistryWebApplication.GSON;
-		
-		Event event = gson.fromJson(payload, Event.class);
+    		
+    		Event event;
+    		try {
+    			event = gson.fromJson(payload, Event.class);
+    		} catch (JsonSyntaxException e) {
+    			Status status = new Status(ErrorCodes.JSON_PARSING);
+    			setStatus(status);
+    			
+    			return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
+    		}
+    		
 		try {
 			if (!getClientInfo().getUser().getIdentifier().equals(event.getOwnerEmail()))
 				throw new UnauthorizedUserException("You are not authorized.");

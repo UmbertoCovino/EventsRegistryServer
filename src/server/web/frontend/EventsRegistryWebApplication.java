@@ -34,9 +34,10 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import commons.Event;
-import commons.GenericSQLException;
-import commons.InvalidUserEmailException;
 import commons.User;
+import exceptions.GenericSQLException;
+import exceptions.InvalidUserEmailException;
+import exceptions.VoidClassFieldException;
 import server.web.resources.json.EventsSizeJSON;
 import server.backend.DBManager;
 import server.backend.EventsAccessObject;
@@ -86,21 +87,21 @@ public class EventsRegistryWebApplication extends Application {
 		public String dbPassword;
 		
 		public boolean hasSomeVoidField() {
-			return port != 0
-				   && webDir != null
-				   && storageDir != null
-				   && eventsPhotosDir != null
-				   && usersPhotosDir != null
-				   && dbName != null
-				   && dbUser != null
-				   && dbPassword != null
-				   && !webDir.equals("")
-				   && !storageDir.equals("")
-				   && !eventsPhotosDir.equals("")
-				   && !usersPhotosDir.equals("")
-				   && !dbName.equals("")
-				   && !dbUser.equals("")
-				   && !dbPassword.equals("");
+			return !(port != 0
+					 && webDir != null
+					 && storageDir != null
+					 && eventsPhotosDir != null
+					 && usersPhotosDir != null
+					 && dbName != null
+					 && dbUser != null
+					 && dbPassword != null
+					 && !webDir.equals("")
+					 && !storageDir.equals("")
+					 && !eventsPhotosDir.equals("")
+					 && !usersPhotosDir.equals("")
+					 && !dbName.equals("")
+					 && !dbUser.equals("")
+					 && !dbPassword.equals(""));
 		}
 	}
 		
@@ -124,6 +125,8 @@ public class EventsRegistryWebApplication extends Application {
 		} catch (InvalidUserEmailException e) {
 			e.printStackTrace();
 		} catch (GenericSQLException e) {
+			e.printStackTrace();
+		} catch (VoidClassFieldException e) {
 			e.printStackTrace();
 		}
 			
@@ -222,20 +225,21 @@ public class EventsRegistryWebApplication extends Application {
 			BufferedReader br = new BufferedReader(new FileReader("settings.json"));
 			settings = gson.fromJson(br, Settings.class);
 			br.close();
+
 			
-			System.err.println("Settings were loaded from file.\n");
+			if (settings.hasSomeVoidField()) {
+				System.err.println("Settings have some void field! Please, fill all fields.");
+				System.exit(-1);
+			} else
+				System.err.println("Settings were loaded from file.\n");
 		} catch (Exception e) {
 			System.err.println("Settings file not found!");
 			System.exit(-1);
 		}
 		
-		if (settings.hasSomeVoidField()) {
-			System.err.println("Settings have some void field! Please, fill all fields.");
-			System.exit(-1);
-		}
-		
 		
 		ROOT_DIR_FOR_WEB_STATIC_FILES = "file:" + File.separator + File.separator + System.getProperty("user.dir") + File.separator + settings.webDir;
+		createDirectoryIfNotExists(System.getProperty("user.dir") + File.separator + settings.webDir);
 		System.err.println("Web directory: " + ROOT_DIR_FOR_WEB_STATIC_FILES + "\n");
 		
 		STORAGE_DIRECTORY = System.getProperty("user.dir") + File.separator + settings.storageDir + File.separator;

@@ -1,9 +1,9 @@
 {
 	"port": "8183",
-	"web_dir": "web",
-	"storage_dir": "storage",
-	"events_photos_dir": "events_photos",
-	"users_photos_dir": "users_photos",
+	"webDir": "web",
+	"storageDir": "storage",
+	"eventsPhotosDir": "events_photos",
+	"usersPhotosDir": "users_photos",
 	"dbName": "events_registry",
 	"dbUser": "root",
 	"dbPassword": "qwerty"

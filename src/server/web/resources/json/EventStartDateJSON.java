@@ -9,12 +9,14 @@ import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
-import commons.ErrorCodes;
-import commons.GenericSQLException;
-import commons.InvalidEventIdException;
-import commons.UnauthorizedUserException;
-import commons.VoidClassFieldException;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
+import exceptions.InvalidEventIdException;
+import exceptions.JsonParsingException;
+import exceptions.UnauthorizedUserException;
+import exceptions.VoidClassFieldException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
@@ -52,7 +54,15 @@ public class EventStartDateJSON extends ServerResource {
 			if (!getClientInfo().getUser().getIdentifier().equals(ownerEmail))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			Date startDate = gson.fromJson(payload, Date.class);
+			Date startDate;
+			try {
+				startDate = gson.fromJson(payload, Date.class);
+			} catch (JsonSyntaxException e) {
+				Status status = new Status(ErrorCodes.JSON_PARSING);
+				setStatus(status);
+				
+				return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
+			}
 			
 			EventsAccessObject.updateEventStartDate(id, startDate);
 			

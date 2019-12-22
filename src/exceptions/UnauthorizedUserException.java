@@ -1,4 +1,4 @@
-package commons;
+package exceptions;
 
 public class UnauthorizedUserException extends Exception {
 	private static final long serialVersionUID = -2161808073357292179L;

@@ -6,13 +6,15 @@ import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
-import commons.ErrorCodes;
-import commons.GenericSQLException;
-import commons.InvalidEventIdException;
-import commons.InvalidUserEmailException;
-import commons.UnauthorizedUserException;
 import commons.User;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
+import exceptions.InvalidEventIdException;
+import exceptions.InvalidUserEmailException;
+import exceptions.JsonParsingException;
+import exceptions.UnauthorizedUserException;
 import server.backend.EventsAccessObject;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
@@ -52,7 +54,15 @@ public class EventUserOwnerJSON extends ServerResource {
 //			if (!getClientInfo().getUser().getIdentifier().equals(ownerEmail))
 //				throw new UnauthorizedUserException("You are not authorized.");
 //			
-//			User user = gson.fromJson(payload, User.class);
+//			User user;
+//			try {
+//				user = gson.fromJson(payload, User.class);
+//			} catch (JsonSyntaxException e) {
+//	    			Status status = new Status(ErrorCodes.JSON_PARSING);
+//	    			setStatus(status);
+//	    			
+//	    			return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
+//	    		}
 //			
 //			UsersAccessObject.updateUser(user);
 //			

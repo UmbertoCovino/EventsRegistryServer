@@ -15,11 +15,11 @@ import org.restlet.resource.ResourceException;
 
 import com.google.gson.Gson;
 
-import commons.ErrorCodes;
 import commons.Event;
-import commons.InvalidEventIdException;
-import commons.InvalidUserEmailException;
 import commons.User;
+import exceptions.ErrorCodes;
+import exceptions.InvalidEventIdException;
+import exceptions.InvalidUserEmailException;
 
 
 public class Test1 {

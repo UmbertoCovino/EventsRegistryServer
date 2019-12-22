@@ -1,0 +1,26 @@
+EventsJSON.java					GET, POST, PUT >> controllo* su POST e PUT	
+EventsSizeJSON.java				solo GET >> niente controlli	
+EventsAfterDateJSON.java			solo	 GET >> niente controlli	
+EventsBeforeDateJSON.java		solo GET >> niente controlli
+EventsFromDateToDateJSON.java	solo GET >> niente controlli
+EventJSON.java					GET, DELETE >> controllo su DELETE			
+EventTitleJSON.java				GET, PUT >> controllo su PUT					
+EventStartDateJSON.java			GET, PUT >> controllo su PUT					
+EventEndDateJSON.java			GET, PUT >> controllo su PUT					
+EventDescriptionJSON.java		GET, PUT >> controllo su PUT					
+EventPhotoJSON.java				GET, PUT >> controllo su PUT					
+EventUserOwnerJSON.java			GET(, PUT >> controllo su PUT)				
+
+UsersJSON.java					GET, POST, PUT >> controllo su POST e PUT	
+UsersSizeJSON.java				solo GET >> niente controlli					
+UserJSON.java					GET, POST, DELETE >> controllo su POST e DELETE
+UserNameJSON.java				GET, PUT >> controllo su PUT					
+UserSurnameJSON.java				GET, PUT >> controllo su PUT					
+UserPasswordJSON.java			GET, PUT >> controllo su PUT					
+UserPhotoJSON.java				GET, PUT >> controllo su PUT					
+UserEventsJSON.java				GET, PUT >> controllo su PUT
+
+per controllo intendo:
+  - eccezioni parsing JSON da restituire opportunamente al chiamante				DONE
+  - eccezioni riguardo oggetti vuoti o parzialmente vuoti (e di conseguenza		
+    non validi) da restituire al chiamante					

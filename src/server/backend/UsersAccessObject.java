@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import commons.Event;
-import commons.GenericSQLException;
-import commons.InvalidUserEmailException;
 import commons.User;
+import exceptions.GenericSQLException;
+import exceptions.InvalidUserEmailException;
+import exceptions.VoidClassFieldException;
 
 public class UsersAccessObject {
 	
@@ -33,8 +34,11 @@ public class UsersAccessObject {
 		return usersNumber;
 	}
 	
-	public synchronized static User getUser(String email) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static User getUser(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		User user = null;
+		
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
@@ -56,8 +60,11 @@ public class UsersAccessObject {
 		return user;
 	}
 	
-	public synchronized static User getUserWithPassword(String email) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static User getUserWithPassword(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		User user = null;
+		
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
@@ -80,8 +87,11 @@ public class UsersAccessObject {
 		return user;
 	}
 	
-	public synchronized static String getUserName(String email) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static String getUserName(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		String name = null;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select name from users where email = '" + email + "';");
@@ -99,8 +109,11 @@ public class UsersAccessObject {
 		return name;
 	}
 	
-	public synchronized static String getUserSurname(String email) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static String getUserSurname(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		String surname = null;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select surname from users where email = '" + email + "';");
@@ -118,8 +131,11 @@ public class UsersAccessObject {
 		return surname;
 	}
 	
-	public synchronized static String getUserPassword(String email) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static String getUserPassword(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		String password = null;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select password from users where email = '" + email + "';");
@@ -137,8 +153,11 @@ public class UsersAccessObject {
 		return password;
 	}
 	
-	public synchronized static String getUserPhotoPath(String email) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static String getUserPhotoPath(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		String photoPath = null;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select photo_path from users where email = '" + email + "';");
@@ -156,7 +175,7 @@ public class UsersAccessObject {
 		return photoPath;
 	}
 	
-	public synchronized static ArrayList<Event> getUserEvents(String email) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static ArrayList<Event> getUserEvents(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		User user = getUser(email);
@@ -238,8 +257,19 @@ public class UsersAccessObject {
 	
 	// ADDERS -----------------------------------------------------------------------------------------------
 
-	public synchronized static void addUser(User user) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static void addUser(User user) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		int result = 0;
+
+		if (user.getEmail() == null || user.getEmail().equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (user.getName() == null || user.getName().equals(""))
+			throw new VoidClassFieldException("The name passed cannot be null or empty.");
+		else if (user.getSurname() == null || user.getSurname().equals(""))
+			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
+		else if (user.getPassword() == null || user.getPassword().equals(""))
+			throw new VoidClassFieldException("The password passed cannot be null or empty.");
+		else if (user.getPhotoPath() == null || user.getPhotoPath().equals(""))
+			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + user.getEmail() + "';");
@@ -267,8 +297,17 @@ public class UsersAccessObject {
 	
 	// UPDATERS --------------------------------------------------------------------------------------------
 
-	public synchronized static int updateUser(User user) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static int updateUser(User user) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		int result = 0;
+		
+		if (user.getEmail() == null || user.getEmail().equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (user.getName() == null || user.getName().equals(""))
+			throw new VoidClassFieldException("The name passed cannot be null or empty.");
+		else if (user.getSurname() == null || user.getSurname().equals(""))
+			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
+		else if (user.getPhotoPath() == null || user.getPhotoPath().equals(""))
+			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + user.getEmail() + "';");
@@ -280,7 +319,6 @@ public class UsersAccessObject {
 				result = DBManager.executeUpdate("update users "
 											   + "set name = '" + user.getName() + "', "
 												   + "surname = '" + user.getSurname() + "', "
-												   + "email = '" + user.getEmail() + "', "
 												   + ((user.getPassword() != null) ? "password = '" + user.getPassword() + "', " : "")
 												   + "photo_path = '" + user.getPhotoPath() + "' "
 											   + "where email = '" + user.getEmail() + "';");
@@ -295,8 +333,13 @@ public class UsersAccessObject {
 			throw new GenericSQLException("An error occurred while updating user to DB.");
 	}
 
-	public synchronized static int updateUserName(String email, String name) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static int updateUserName(String email, String name) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		int result = 0;
+		
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (name == null || name.equals(""))
+			throw new VoidClassFieldException("The name passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
@@ -319,8 +362,13 @@ public class UsersAccessObject {
 			throw new GenericSQLException("An error occurred while updating user to DB.");
 	}
 
-	public synchronized static int updateUserSurname(String email, String surname) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static int updateUserSurname(String email, String surname) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		int result = 0;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (surname == null || surname.equals(""))
+			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
@@ -343,8 +391,13 @@ public class UsersAccessObject {
 			throw new GenericSQLException("An error occurred while updating user to DB.");
 	}
 
-	public synchronized static int updateUserPassword(String email, String password) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static int updateUserPassword(String email, String password) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		int result = 0;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (password == null || password.equals(""))
+			throw new VoidClassFieldException("The password passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
@@ -367,8 +420,13 @@ public class UsersAccessObject {
 			throw new GenericSQLException("An error occurred while updating user to DB.");
 	}
 
-	public synchronized static int updateUserPhotoPath(String email, String photoPath) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static int updateUserPhotoPath(String email, String photoPath) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		int result = 0;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (photoPath == null || photoPath.equals(""))
+			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
@@ -395,8 +453,11 @@ public class UsersAccessObject {
 
 	// REMOVERS ----------------------------------------------------------------------------------------------
 
-	public synchronized static int removeUser(String email) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static int removeUser(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		int result = 0;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");

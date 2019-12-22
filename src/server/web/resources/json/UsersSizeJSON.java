@@ -8,8 +8,8 @@ import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
 
-import commons.ErrorCodes;
-import commons.GenericSQLException;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 

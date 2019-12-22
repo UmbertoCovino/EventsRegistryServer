@@ -10,12 +10,13 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import commons.ErrorCodes;
 import commons.Event;
-import commons.GenericSQLException;
-import commons.InvalidEventIdException;
-import commons.InvalidUserEmailException;
-import commons.UnauthorizedUserException;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
+import exceptions.InvalidEventIdException;
+import exceptions.InvalidUserEmailException;
+import exceptions.UnauthorizedUserException;
+import exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
@@ -43,6 +44,11 @@ public class UserEventsJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);

@@ -6,11 +6,14 @@ import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
-import commons.ErrorCodes;
-import commons.GenericSQLException;
-import commons.InvalidUserEmailException;
-import commons.UnauthorizedUserException;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
+import exceptions.InvalidUserEmailException;
+import exceptions.JsonParsingException;
+import exceptions.UnauthorizedUserException;
+import exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
@@ -29,6 +32,11 @@ public class UserSurnameJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, InvalidUserEmailException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);
@@ -46,7 +54,15 @@ public class UserSurnameJSON extends ServerResource {
 			if (!getClientInfo().getUser().getIdentifier().equals(getAttribute("email")))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			String surname = gson.fromJson(payload, String.class);
+			String surname;
+			try {
+				surname = gson.fromJson(payload, String.class);
+			} catch (JsonSyntaxException e) {
+	    			Status status = new Status(ErrorCodes.JSON_PARSING);
+	    			setStatus(status);
+	    			
+	    			return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
+	    		}
 			
 			UsersAccessObject.updateUserSurname(email, surname);
 			
@@ -61,6 +77,11 @@ public class UserSurnameJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);

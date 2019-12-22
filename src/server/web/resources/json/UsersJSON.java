@@ -11,12 +11,15 @@ import org.restlet.resource.ServerResource;
 import org.restlet.security.MapVerifier;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
-import commons.ErrorCodes;
-import commons.GenericSQLException;
-import commons.InvalidUserEmailException;
-import commons.UnauthorizedUserException;
 import commons.User;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
+import exceptions.InvalidUserEmailException;
+import exceptions.JsonParsingException;
+import exceptions.UnauthorizedUserException;
+import exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
@@ -43,7 +46,16 @@ public class UsersJSON extends ServerResource {
     public String addUser(String payload) throws ParseException {   	
     		Gson gson = EventsRegistryWebApplication.GSON;
 		
-		User user = gson.fromJson(payload, User.class);
+		User user;
+		try {
+			user = gson.fromJson(payload, User.class);
+		} catch (JsonSyntaxException e) {
+			Status status = new Status(ErrorCodes.JSON_PARSING);
+			setStatus(status);
+			
+			return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
+		}
+		
 		try {
 			UsersAccessObject.addUser(user);
 			
@@ -63,6 +75,11 @@ public class UsersJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, InvalidUserEmailException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);
@@ -75,7 +92,16 @@ public class UsersJSON extends ServerResource {
     public String updateUser(String payload) throws ParseException, InvalidUserEmailException {
     		Gson gson = EventsRegistryWebApplication.GSON;
 		
-		User user = gson.fromJson(payload, User.class);
+		User user;
+		try {
+			user = gson.fromJson(payload, User.class);
+		} catch (JsonSyntaxException e) {
+			Status status = new Status(ErrorCodes.JSON_PARSING);
+			setStatus(status);
+			
+			return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
+		}
+		
 		try {
 			if (!getClientInfo().getUser().getIdentifier().equals(user.getEmail()))
 				throw new UnauthorizedUserException("You are not authorized.");
@@ -91,6 +117,11 @@ public class UsersJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);

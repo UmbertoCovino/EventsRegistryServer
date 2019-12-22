@@ -16,10 +16,11 @@ import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
 
-import commons.ErrorCodes;
-import commons.GenericSQLException;
-import commons.InvalidUserEmailException;
-import commons.UnauthorizedUserException;
+import exceptions.ErrorCodes;
+import exceptions.GenericSQLException;
+import exceptions.InvalidUserEmailException;
+import exceptions.UnauthorizedUserException;
+import exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
@@ -47,6 +48,12 @@ public class UserPhotoJSON extends ServerResource {
 			setStatus(status);
 			
 //			return gson.toJson(e, InvalidUserEmailException.class);
+			return null;
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			//return gson.toJson(e, VoidClassFieldException.class);
 			return null;
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
@@ -86,6 +93,11 @@ public class UserPhotoJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);

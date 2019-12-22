@@ -14,12 +14,13 @@ import commons.GenericSQLException;
 import commons.InvalidEventIdException;
 import commons.InvalidUserEmailException;
 import server.backend.EventsAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
-public class EventsRegistryEventsFromDateToDateJSON extends ServerResource {
+public class EventsFromDateToDateJSON extends ServerResource {
 	
 	@Get
 	public String getEvents() throws ParseException, InvalidEventIdException, InvalidUserEmailException {   	
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 
 		Date fromDate = Event.DATETIME_SDF.parse(getAttribute("from"));
 		Date toDate = Event.DATETIME_SDF.parse(getAttribute("to"));

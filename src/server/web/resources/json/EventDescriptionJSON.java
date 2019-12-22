@@ -13,12 +13,13 @@ import commons.InvalidEventIdException;
 import commons.UnauthorizedUserException;
 import commons.VoidClassFieldException;
 import server.backend.EventsAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventDescriptionJSON extends ServerResource {
 	
 	@Get
     public String getDescription() {
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
 			String description = EventsAccessObject.getEventDescription(Integer.valueOf(getAttribute("id")));
@@ -39,7 +40,7 @@ public class EventDescriptionJSON extends ServerResource {
     
     @Put
     public String updateDescription(String payload) {
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));
 		
 		try {

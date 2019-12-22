@@ -3,7 +3,11 @@ package server.web.frontend;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.sql.ResultSet;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.restlet.Application;
@@ -24,11 +28,16 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 import commons.Event;
+import commons.GenericSQLException;
 import commons.InvalidUserEmailException;
 import commons.User;
-import server.web.resources.json.EventsRegistrySizeJSON;
+import server.web.resources.json.EventsSizeJSON;
 import server.backend.DBManager;
 import server.backend.EventsAccessObject;
 import server.backend.TelegramBot;
@@ -40,24 +49,28 @@ import server.web.resources.json.EventDescriptionJSON;
 import server.web.resources.json.EventEndDateJSON;
 import server.web.resources.json.EventTitleJSON;
 import server.web.resources.json.EventUserOwnerJSON;
-import server.web.resources.json.EventsRegistryEventsAfterDateJSON;
-import server.web.resources.json.EventsRegistryEventsBeforeDateJSON;
-import server.web.resources.json.EventsRegistryJSON;
-import server.web.resources.json.EventsRegistryEventsFromDateToDateJSON;
+import server.web.resources.json.EventsAfterDateJSON;
+import server.web.resources.json.EventsBeforeDateJSON;
+import server.web.resources.json.EventsJSON;
+import server.web.resources.json.EventsFromDateToDateJSON;
 import server.web.resources.json.UserEventsJSON;
 import server.web.resources.json.UserJSON;
 import server.web.resources.json.UserNameJSON;
 import server.web.resources.json.UserPasswordJSON;
 import server.web.resources.json.UserPhotoJSON;
 import server.web.resources.json.UserSurnameJSON;
-import server.web.resources.json.UsersRegistryJSON;
-import server.web.resources.json.UsersRegistrySizeJSON;
+import server.web.resources.json.UsersJSON;
+import server.web.resources.json.UsersSizeJSON;
 
 public class EventsRegistryWebApplication extends Application {
 	public static String STORAGE_DIRECTORY,
 						EVENTS_PHOTOS_DIRECTORY,
 						USERS_PHOTOS_DIRECTORY;
 	
+	public static final Gson GSON = new GsonBuilder()
+			.registerTypeAdapter(Date.class, new DateTypeAdapter())
+			.create();
+
 	private static String ROOT_DIR_FOR_WEB_STATIC_FILES;
 	
 	private MapVerifier verifier; 
@@ -105,24 +118,25 @@ public class EventsRegistryWebApplication extends Application {
 		
 		verifier = new MapVerifier();
 		
-		// TODO restore this part
-//		for (String email: UsersAccessObject.getUsersEmails())
-//			try {
-//				verifier.getLocalSecrets().put(email, UsersAccessObject.getUser(email).getPassword().toCharArray());
-//			} catch (InvalidUserEmailException e) {
-//				e.printStackTrace();
-//			}
+		try {
+			for (String email : UsersAccessObject.getUsersEmails())
+				verifier.getLocalSecrets().put(email, UsersAccessObject.getUserPassword(email).toCharArray());
+		} catch (InvalidUserEmailException e) {
+			e.printStackTrace();
+		} catch (GenericSQLException e) {
+			e.printStackTrace();
+		}
 			
 		getContext().setDefaultVerifier(verifier);
 		
 		router.attach("/eventsRegistry/web", webStaticFilesDirectory);
 		router.attach("/eventsRegistry/web/", webStaticFilesDirectory);
 		
-		router.attach("/eventsRegistry/events", getGuardExcludingGet(EventsRegistryJSON.class));
-		router.attach("/eventsRegistry/events/size", EventsRegistrySizeJSON.class);									// not used
-		router.attach("/eventsRegistry/events/after/{date}", EventsRegistryEventsAfterDateJSON.class);
-		router.attach("/eventsRegistry/events/before/{date}", EventsRegistryEventsBeforeDateJSON.class);
-		router.attach("/eventsRegistry/events/between/{from}/{to}", EventsRegistryEventsFromDateToDateJSON.class);
+		router.attach("/eventsRegistry/events", getGuardExcludingGet(EventsJSON.class));
+		router.attach("/eventsRegistry/events/size", EventsSizeJSON.class);									// not used
+		router.attach("/eventsRegistry/events/after/{date}", EventsAfterDateJSON.class);
+		router.attach("/eventsRegistry/events/before/{date}", EventsBeforeDateJSON.class);
+		router.attach("/eventsRegistry/events/between/{from}/{to}", EventsFromDateToDateJSON.class);
 		router.attach("/eventsRegistry/events/{id}", getGuardExcludingGet(EventJSON.class));						// not used
 		router.attach("/eventsRegistry/events/{id}/title", getGuardExcludingGet(EventTitleJSON.class));				// not used
 		router.attach("/eventsRegistry/events/{id}/startDate", getGuardExcludingGet(EventStartDateJSON.class));		// not used
@@ -131,8 +145,8 @@ public class EventsRegistryWebApplication extends Application {
 		router.attach("/eventsRegistry/events/{id}/photo", getGuardExcludingGet(EventPhotoJSON.class));
 		router.attach("/eventsRegistry/events/{id}/userOwner", getGuardExcludingGet(EventUserOwnerJSON.class));				// not used
 		
-		router.attach("/eventsRegistry/users", getGuardExcludingGetAndPost(UsersRegistryJSON.class));
-		router.attach("/eventsRegistry/users/size", UsersRegistrySizeJSON.class);									// not used
+		router.attach("/eventsRegistry/users", getGuardExcludingGetAndPost(UsersJSON.class));
+		router.attach("/eventsRegistry/users/size", UsersSizeJSON.class);									// not used
 		router.attach("/eventsRegistry/users/{email}", getGuardExcludingGetAndPost(UserJSON.class));
 		router.attach("/eventsRegistry/users/{email}/name", getGuardExcludingGet(UserNameJSON.class));				// not used
 		router.attach("/eventsRegistry/users/{email}/surname", getGuardExcludingGet(UserSurnameJSON.class));		// not used
@@ -334,5 +348,26 @@ public class EventsRegistryWebApplication extends Application {
 		
 		return true;
 	}
+	
+	static class DateTypeAdapter extends TypeAdapter<Date> {
+
+		@Override
+		public void write(JsonWriter out, Date value) throws IOException {
+			if (value != null)
+				out.value(Event.DATETIME_SDF.format(value));
+			else
+				out.nullValue();
+		}
+
+		@Override
+		public Date read(JsonReader in) throws IOException {
+			try {
+				return Event.DATETIME_SDF.parse(in.nextString());
+			} catch (ParseException e) {
+				throw new IOException("Invalid format for datetime: correct one is 'yyyy-MM-dd HH:mm'.");
+			}
+		}
+	}
+
 }
    

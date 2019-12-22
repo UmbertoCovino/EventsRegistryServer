@@ -15,12 +15,13 @@ import commons.UnauthorizedUserException;
 import commons.User;
 import server.backend.EventsAccessObject;
 import server.backend.UsersAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventUserOwnerJSON extends ServerResource {
 	
 	@Get
     public String getUser() throws InvalidUserEmailException {
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
 			User owner = EventsAccessObject.getEventOwner(Integer.valueOf(getAttribute("id")));

@@ -19,12 +19,13 @@ import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
 import commons.VoidClassFieldException;
 import server.backend.EventsAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
-public class EventsRegistryJSON extends ServerResource {
+public class EventsJSON extends ServerResource {
 	
 	@Get
 	public String getEvents() throws ParseException {   	
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		ArrayList<Event> events = null;
 		try {
@@ -41,7 +42,7 @@ public class EventsRegistryJSON extends ServerResource {
     
     @Post
     public String addEvent(String payload) throws ParseException, InvalidUserEmailException {   	
-		Gson gson = new Gson();
+    		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		Event event = gson.fromJson(payload, Event.class);
 		try {
@@ -76,7 +77,7 @@ public class EventsRegistryJSON extends ServerResource {
     
     @Put
     public String updateEvent(String payload) throws ParseException, InvalidEventIdException {
-		Gson gson = new Gson();
+    		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		Event event = gson.fromJson(payload, Event.class);
 		try {

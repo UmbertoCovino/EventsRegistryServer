@@ -20,7 +20,6 @@ import commons.Event;
 import commons.InvalidEventIdException;
 import commons.InvalidUserEmailException;
 import commons.User;
-import server.backend.wrapper.EventsRegistryAPI;
 
 
 public class Test1 {
@@ -34,7 +33,7 @@ public class Test1 {
 		
 		
 //		System.out.println(testPostEventType("events", new Event("Concerto Vasco Rossi", new Date(118, 1, 5), new Date(118, 1, 5, 21, 00), new Date(118, 1, 5, 00, 00), 
-//				"Vasco sarà  qui."), Event.class, "upcovino@gmail.com", "1234"));
+//				"Vasco sarï¿½ qui."), Event.class, "upcovino@gmail.com", "1234"));
 //		System.out.println();
 		
 		

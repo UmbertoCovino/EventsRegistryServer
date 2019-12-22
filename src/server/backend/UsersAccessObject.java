@@ -214,9 +214,25 @@ public class UsersAccessObject {
 		return users;
 	}
 
-//	public static String[] getUsersEmails() {
-//		return null;
-//	}
+	public static String[] getUsersEmails() throws GenericSQLException {
+		ArrayList<String> emails = new ArrayList<>();
+		
+		try {
+			ResultSet rs = DBManager.executeQuery("select email from users;");
+			
+			while (rs.next()) {
+				String email = rs.getString("email");
+				
+				emails.add(email);
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+
+		return emails.toArray(new String[emails.size()]);
+	}
 
 	
 	

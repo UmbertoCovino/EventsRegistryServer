@@ -24,10 +24,10 @@ public class UserJSON extends ServerResource {
 
 	@Get
     public String getUser() throws ParseException {
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
-			User user = UsersAccessObject.getUserWithPassword(getAttribute("email"));
+			User user = UsersAccessObject.getUser(getAttribute("email"));
 		
 			return gson.toJson(user, User.class);
 		} catch (InvalidUserEmailException e) {
@@ -45,7 +45,7 @@ public class UserJSON extends ServerResource {
 	
 	@Post
     public String getUserIfPasswordIsCorrect(String payload) throws ParseException {
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 
 		String password = gson.fromJson(payload, String.class);
 		try {
@@ -70,7 +70,7 @@ public class UserJSON extends ServerResource {
     
     @Delete
     public String deleteUser() {
-		Gson gson = new Gson();
+    		Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");
 		
 		try {

@@ -16,12 +16,13 @@ import commons.InvalidEventIdException;
 import commons.UnauthorizedUserException;
 import commons.VoidClassFieldException;
 import server.backend.EventsAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventStartDateJSON extends ServerResource {
 	
 	@Get
     public String getStartDate() throws ParseException {
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
 			Date startDate = EventsAccessObject.getEventStartDate(Integer.valueOf(getAttribute("id")));
@@ -42,7 +43,7 @@ public class EventStartDateJSON extends ServerResource {
     
     @Put
     public String updateStartDate(String payload) {
-		Gson gson = new Gson();
+    		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));
 		
 		try {

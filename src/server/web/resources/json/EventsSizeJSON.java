@@ -11,12 +11,13 @@ import com.google.gson.Gson;
 import commons.ErrorCodes;
 import commons.GenericSQLException;
 import server.backend.EventsAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
-public class EventsRegistrySizeJSON extends ServerResource {
+public class EventsSizeJSON extends ServerResource {
 	
 	@Get
 	public String getSize() throws ParseException {    	
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
 			return gson.toJson(new Integer(EventsAccessObject.getNumberOfEvents()), Integer.class);

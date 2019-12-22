@@ -59,7 +59,7 @@ public class UserPhotoJSON extends ServerResource {
     
     @Put
     public String updatePhoto(Representation entity) throws ResourceException {
-		Gson gson = new Gson();
+    		Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");
 		
 		try {

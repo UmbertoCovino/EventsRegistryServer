@@ -215,7 +215,7 @@ public class EventsAccessObject {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		try {
-			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+			ResultSet rs = DBManager.executeQuery("select id, title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
 											   + "from events E join users U on user_owner_email = email "
 											   + "order by start_date;");
 			
@@ -252,7 +252,7 @@ public class EventsAccessObject {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		try {
-			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+			ResultSet rs = DBManager.executeQuery("select id, title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
 											   + "from events E join users U on user_owner_email = email "
 											   + "where start_date >= '" + DATETIME_SDF.format(date) + "' "
 											   + "order by start_date;");
@@ -290,7 +290,7 @@ public class EventsAccessObject {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		try {
-			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+			ResultSet rs = DBManager.executeQuery("select id, title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
 											   + "from events E join users U on user_owner_email = email "
 											   + "where start_date <= '" + DATETIME_SDF.format(date) + "' "
 											   + "order by start_date;");
@@ -328,7 +328,7 @@ public class EventsAccessObject {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		try {
-			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+			ResultSet rs = DBManager.executeQuery("select id, title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
 											   + "from events E join users U on user_owner_email = email "
 											   + "where start_date between '" + DATETIME_SDF.format(fromDate) + "' and '" + DATETIME_SDF.format(toDate) + "' "
 											   + "order by start_date;");

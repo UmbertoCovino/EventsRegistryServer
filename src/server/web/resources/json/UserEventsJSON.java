@@ -17,12 +17,13 @@ import commons.InvalidEventIdException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
 import server.backend.UsersAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
 public class UserEventsJSON extends ServerResource {
 	
 	@Get
 	public String getEvents() throws ParseException, JsonSyntaxException, InvalidEventIdException {   	
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");
 		
 		try {

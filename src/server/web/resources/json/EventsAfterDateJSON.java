@@ -14,18 +14,19 @@ import commons.GenericSQLException;
 import commons.InvalidEventIdException;
 import commons.InvalidUserEmailException;
 import server.backend.EventsAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
-public class EventsRegistryEventsBeforeDateJSON extends ServerResource {
+public class EventsAfterDateJSON extends ServerResource {
 	
 	@Get
-	public String getEvents() throws ParseException, InvalidEventIdException, InvalidUserEmailException {   	
-		Gson gson = new Gson();
+	public String getEvents() throws ParseException, InvalidEventIdException, InvalidUserEmailException {
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		Date date = Event.DATETIME_SDF.parse(getAttribute("date"));
 		
 		ArrayList<Event> events = null;
 		try {
-			events = EventsAccessObject.getEventsBeforeDate(date);
+			events = EventsAccessObject.getEventsAfterDate(date);
 		} catch (GenericSQLException e) {
 			e.printStackTrace();
 		}

@@ -12,12 +12,13 @@ import commons.GenericSQLException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
 import server.backend.UsersAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
 public class UserNameJSON extends ServerResource {
 
 	@Get
     public String getName() {
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
 			String name = UsersAccessObject.getUserName(getAttribute("email"));
@@ -38,7 +39,7 @@ public class UserNameJSON extends ServerResource {
     
     @Put
     public String updateName(String payload) {
-		Gson gson = new Gson();
+    		Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");
 		
 		try {

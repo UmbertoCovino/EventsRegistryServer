@@ -21,8 +21,8 @@ import server.web.frontend.EventsRegistryWebApplication;
 public class EventJSON extends ServerResource {
 	
     @Get
-    public String getEvent() throws ParseException {   	
-		Gson gson = new Gson();
+    public String getEvent() throws ParseException {
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
 			Event event = EventsAccessObject.getEvent(Integer.parseInt(getAttribute("id"))).clone();
@@ -42,8 +42,8 @@ public class EventJSON extends ServerResource {
     }
     
     @Delete
-    public String deleteEvent(){
-    		Gson gson = new Gson();
+    public String deleteEvent() {
+		Gson gson = EventsRegistryWebApplication.GSON;
     		int id = Integer.valueOf(getAttribute("id"));
 		
 		try {

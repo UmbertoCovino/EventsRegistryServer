@@ -15,12 +15,13 @@ import commons.InvalidEventIdException;
 import commons.UnauthorizedUserException;
 import commons.VoidClassFieldException;
 import server.backend.EventsAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventTitleJSON extends ServerResource {
 	
     @Get
     public String getTitle() throws ParseException {
-		Gson gson = new Gson();
+    		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
 			String title = EventsAccessObject.getEventTitle(Integer.valueOf(getAttribute("id")));
@@ -41,7 +42,7 @@ public class EventTitleJSON extends ServerResource {
     
     @Put
     public String updateTitle(String payload) {
-		Gson gson = new Gson();
+    		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));
 		
 		try {

@@ -28,7 +28,7 @@ public class EventPhotoJSON extends ServerResource {
 	@Get
     public Representation getPhoto() throws ResourceException {
 		@SuppressWarnings("unused")
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
     			int id = Integer.valueOf(getAttribute("id"));
@@ -63,7 +63,7 @@ public class EventPhotoJSON extends ServerResource {
     
     @Put
     public String updatePhoto(Representation entity) throws ResourceException {
-		Gson gson = new Gson();
+		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));
 		
 		try {

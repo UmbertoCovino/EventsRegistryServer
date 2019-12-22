@@ -26,6 +26,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.google.gson.Gson;
 
 import commons.Event;
+import commons.GenericSQLException;
 import commons.InvalidUserEmailException;
 import commons.User;
 import server.web.resources.json.EventsRegistrySizeJSON;
@@ -105,13 +106,14 @@ public class EventsRegistryWebApplication extends Application {
 		
 		verifier = new MapVerifier();
 		
-		// TODO restore this part
-//		for (String email: UsersAccessObject.getUsersEmails())
-//			try {
-//				verifier.getLocalSecrets().put(email, UsersAccessObject.getUser(email).getPassword().toCharArray());
-//			} catch (InvalidUserEmailException e) {
-//				e.printStackTrace();
-//			}
+		try {
+			for (String email : UsersAccessObject.getUsersEmails())
+				verifier.getLocalSecrets().put(email, UsersAccessObject.getUserPassword(email).toCharArray());
+		} catch (InvalidUserEmailException e) {
+			e.printStackTrace();
+		} catch (GenericSQLException e) {
+			e.printStackTrace();
+		}
 			
 		getContext().setDefaultVerifier(verifier);
 		

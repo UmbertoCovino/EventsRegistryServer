@@ -12,35 +12,26 @@ import com.google.gson.JsonSyntaxException;
 
 import commons.ErrorCodes;
 import commons.Event;
+import commons.GenericSQLException;
 import commons.InvalidEventIdException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
-import commons.User;
-import server.backend.wrapper.UsersRegistryAPI;
+import server.backend.UsersAccessObject;
 
 public class UserEventsJSON extends ServerResource {
 	
 	@Get
 	public String getEvents() throws ParseException, JsonSyntaxException, InvalidEventIdException {   	
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
+		String email = getAttribute("email");
 		
 		try {
-			if (!getClientInfo().getUser().getIdentifier().equals(getAttribute("email")))
+			if (!getClientInfo().getUser().getIdentifier().equals(email))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			User user = urapi.get(getAttribute("email"));
+			ArrayList<Event> events = UsersAccessObject.getUserEvents(getAttribute("email"));
 			
-			Event[] events = gson.fromJson(new EventsRegistryJSON().getEvents(), Event[].class);
-			ArrayList<Event> eventsFilteredAL = new ArrayList<Event>();
-			
-			for (Event event: events)
-				if (event.getUserEmail().equals(user.getEmail()))
-					eventsFilteredAL.add(event);
-			
-			Event[] eventsFiltered = eventsFilteredAL.toArray(new Event[eventsFilteredAL.size()]);
-			
-			return gson.toJson(eventsFiltered, Event[].class);
+			return gson.toJson(events.toArray(new Event[events.size()]), Event[].class);
 		} catch (InvalidUserEmailException e) {
 			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);
 			setStatus(status);
@@ -51,6 +42,11 @@ public class UserEventsJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
 	}
 }

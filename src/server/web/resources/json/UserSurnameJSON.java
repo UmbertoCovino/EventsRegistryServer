@@ -8,44 +8,48 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 
 import commons.ErrorCodes;
+import commons.GenericSQLException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
-import commons.User;
-import server.backend.wrapper.UsersRegistryAPI;
+import server.backend.UsersAccessObject;
 
 public class UserSurnameJSON extends ServerResource {
 
 	@Get
     public String getSurname() {
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
 		
 		try {
-			User user = urapi.get(getAttribute("email"));
+			String surname = UsersAccessObject.getUserSurname(getAttribute("email"));
 		
-			return gson.toJson(user.getSurname(), String.class);   	
+			return gson.toJson(surname, String.class);   	
 		} catch (InvalidUserEmailException e) {
 			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);
 			setStatus(status);
 			
 			return gson.toJson(e, InvalidUserEmailException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
     }
     
     @Put
     public String updateSurname(String payload) {
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
+		String email = getAttribute("email");
 		
 		try {
 			if (!getClientInfo().getUser().getIdentifier().equals(getAttribute("email")))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			User user = urapi.get(getAttribute("email"));
-			user.setSurname(gson.fromJson(payload, String.class));
-			urapi.update(user);
+			String surname = gson.fromJson(payload, String.class);
 			
-			return gson.toJson("Surname updated for user with email " + getAttribute("email") + ".", String.class);
+			UsersAccessObject.updateUserSurname(email, surname);
+			
+			return gson.toJson("Surname updated for user with email " + email + ".", String.class);
 		} catch (InvalidUserEmailException e) {
 			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);
 			setStatus(status);
@@ -56,6 +60,11 @@ public class UserSurnameJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
 	}
 }

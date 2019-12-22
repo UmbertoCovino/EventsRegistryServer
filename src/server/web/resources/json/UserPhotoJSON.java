@@ -17,21 +17,20 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 
 import commons.ErrorCodes;
+import commons.GenericSQLException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
-import commons.User;
-import server.backend.wrapper.UsersRegistryAPI;
+import server.backend.UsersAccessObject;
+import server.web.frontend.EventsRegistryWebApplication;
 
 public class UserPhotoJSON extends ServerResource {
 
 	@Get
     public Representation getPhoto() throws ResourceException {
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
-		
 		try {
-			User user = urapi.get(getAttribute("email"));
+			String photoPath = UsersAccessObject.getUserPhotoPath(getAttribute("email"));
 			
-			Path path = Paths.get(urapi.getPhotosDirectory() + user.getPhotoPath());
+			Path path = Paths.get(EventsRegistryWebApplication.USERS_PHOTOS_DIRECTORY + photoPath);
 			
 			if (!new File(path.toString()).exists())
 				//return gson.toJson("There is no photo for user with email " + getAttribute("email") + ".", String.class);
@@ -49,22 +48,28 @@ public class UserPhotoJSON extends ServerResource {
 			
 //			return gson.toJson(e, InvalidUserEmailException.class);
 			return null;
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+//			return gson.toJson(e, GenericSQLException.class);
+			return null;
 		}
     }
     
     @Put
     public String updatePhoto(Representation entity) throws ResourceException {
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
+		String email = getAttribute("email");
 		
 		try {
-			if (!getClientInfo().getUser().getIdentifier().equals(getAttribute("email")))
+			if (!getClientInfo().getUser().getIdentifier().equals(email))
 				throw new UnauthorizedUserException("You are not authorized.");
-			
-			User user = urapi.get(getAttribute("email"));
+
+			String photoPath = UsersAccessObject.getUserPhotoPath(getAttribute("email"));
 			
 			try {
-				entity.write(new FileOutputStream(new File(urapi.getPhotosDirectory() + user.getPhotoPath())));
+				entity.write(new FileOutputStream(new File(EventsRegistryWebApplication.USERS_PHOTOS_DIRECTORY + photoPath)));
 			} catch (Exception e) {
 				throw new ResourceException(e);
 			}
@@ -81,6 +86,12 @@ public class UserPhotoJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+//			return gson.toJson(e, GenericSQLException.class);
+			return null;
 		}
 	}
 }

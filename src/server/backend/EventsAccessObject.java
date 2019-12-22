@@ -41,22 +41,24 @@ public class EventsAccessObject {
 		Event event = null;
 		
 		try {
-			ResultSet rs = DBManager.executeQuery("select * from events where id = " + id + ";");
+			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+											   + "from events E join users U on user_owner_email = email "
+											   + "where id = " + id + ";");
 
 			if (rs.next()) {
 				String title = rs.getString("title");
 				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
 				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
 				String description = rs.getString("description");
-				String photoPath = rs.getString("photo_path");
+				String photoPath = rs.getString("e_photo_path");
 				String ownerEmail = rs.getString("user_owner_email");
 				
-				User owner;
-				try {
-					owner = UsersAccessObject.getUser(ownerEmail).cloneWithoutPassword();
-				} catch (InvalidUserEmailException e) {
-					owner = null;
-				}
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String email = rs.getString("email");
+				String userPhotoPath = rs.getString("u_photo_path");
+				
+				User owner = new User(name, surname, email, userPhotoPath);
 				
 				event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, owner);
 			} else
@@ -213,7 +215,9 @@ public class EventsAccessObject {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		try {
-			ResultSet rs = DBManager.executeQuery("select * from events;");
+			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+											   + "from events E join users U on user_owner_email = email "
+											   + "order by start_date;");
 			
 			while (rs.next()) {
 				int id = rs.getInt("id");
@@ -221,15 +225,15 @@ public class EventsAccessObject {
 				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
 				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
 				String description = rs.getString("description");
-				String photoPath = rs.getString("photo_path");
+				String photoPath = rs.getString("e_photo_path");
 				String ownerEmail = rs.getString("user_owner_email");
-
-				User owner;
-				try {
-					owner = UsersAccessObject.getUser(ownerEmail).cloneWithoutPassword();
-				} catch (InvalidUserEmailException e) {
-					owner = null;
-				}
+				
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String email = rs.getString("email");
+				String userPhotoPath = rs.getString("u_photo_path");
+				
+				User owner = new User(name, surname, email, userPhotoPath);
 				
 				Event event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, owner);
 				
@@ -243,12 +247,15 @@ public class EventsAccessObject {
 		
 		return events;
 	}
-	
-	public synchronized static ArrayList<Event> getEventsOrderedByStartDateAsc() throws GenericSQLException {
+
+	public static ArrayList<Event> getEventsAfterDate(Date date) throws GenericSQLException {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		try {
-			ResultSet rs = DBManager.executeQuery("select * from events order by start_date;");
+			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+											   + "from events E join users U on user_owner_email = email "
+											   + "where start_date >= '" + DATETIME_SDF.format(date) + "' "
+											   + "order by start_date;");
 			
 			while (rs.next()) {
 				int id = rs.getInt("id");
@@ -256,15 +263,91 @@ public class EventsAccessObject {
 				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
 				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
 				String description = rs.getString("description");
-				String photoPath = rs.getString("photo_path");
+				String photoPath = rs.getString("e_photo_path");
 				String ownerEmail = rs.getString("user_owner_email");
+				
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String email = rs.getString("email");
+				String userPhotoPath = rs.getString("u_photo_path");
+				
+				User owner = new User(name, surname, email, userPhotoPath);
+				
+				Event event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, owner);
+				
+				events.add(event);
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+		
+		return events;
+	}
 
-				User owner;
-				try {
-					owner = UsersAccessObject.getUser(ownerEmail).cloneWithoutPassword();
-				} catch (InvalidUserEmailException e) {
-					owner = null;
-				}
+	public static ArrayList<Event> getEventsBeforeDate(Date date) throws GenericSQLException {
+		ArrayList<Event> events = new ArrayList<>();
+		
+		try {
+			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+											   + "from events E join users U on user_owner_email = email "
+											   + "where start_date <= '" + DATETIME_SDF.format(date) + "' "
+											   + "order by start_date;");
+			
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String title = rs.getString("title");
+				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
+				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
+				String description = rs.getString("description");
+				String photoPath = rs.getString("e_photo_path");
+				String ownerEmail = rs.getString("user_owner_email");
+				
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String email = rs.getString("email");
+				String userPhotoPath = rs.getString("u_photo_path");
+				
+				User owner = new User(name, surname, email, userPhotoPath);
+				
+				Event event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, owner);
+				
+				events.add(event);
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+		
+		return events;
+	}
+
+	public static ArrayList<Event> getEventsBetweenTwoDates(Date fromDate, Date toDate) throws GenericSQLException {
+		ArrayList<Event> events = new ArrayList<>();
+		
+		try {
+			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+											   + "from events E join users U on user_owner_email = email "
+											   + "where start_date between '" + DATETIME_SDF.format(fromDate) + "' and '" + DATETIME_SDF.format(toDate) + "' "
+											   + "order by start_date;");
+			
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String title = rs.getString("title");
+				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
+				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
+				String description = rs.getString("description");
+				String photoPath = rs.getString("e_photo_path");
+				String ownerEmail = rs.getString("user_owner_email");
+				
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String email = rs.getString("email");
+				String userPhotoPath = rs.getString("u_photo_path");
+				
+				User owner = new User(name, surname, email, userPhotoPath);
 				
 				Event event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, owner);
 				

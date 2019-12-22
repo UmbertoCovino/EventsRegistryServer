@@ -1,6 +1,8 @@
 package server.web.resources.json;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+
 import org.restlet.data.Status;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -11,37 +13,43 @@ import org.restlet.security.MapVerifier;
 import com.google.gson.Gson;
 
 import commons.ErrorCodes;
+import commons.GenericSQLException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
 import commons.User;
-import server.backend.wrapper.UsersRegistryAPI;
+import server.backend.UsersAccessObject;
 
 public class UsersRegistryJSON extends ServerResource {
 
 	@Get
 	public String getUsers() throws ParseException, InvalidUserEmailException {   	
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
 		
-		String[] emails = urapi.emails();
-		User[] users = new User[emails.length];
+		ArrayList<User> users = null;
+		try {
+			users = UsersAccessObject.getUsers();
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
+		}
 		
-		for (int i = 0; i < emails.length; i++)
-			users[i] = urapi.get(emails[i]).cloneWithoutPassword();
-		
-		return gson.toJson(users, User[].class);
+		return gson.toJson(users.toArray(new User[users.size()]), User[].class);
 	}
     
     @Post
     public String addUser(String payload) throws ParseException {   	
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
 		
 		User user = gson.fromJson(payload, User.class);
 		try {
-			user.setPhotoPath(user.getEmail() + ".jpg");
+			UsersAccessObject.addUser(user);
 			
-			urapi.add(user);
+			String email = user.getEmail();
+			String photoPath = email + ".jpg";
+			
+			UsersAccessObject.updateUserPhotoPath(email, photoPath);
 			
 			((MapVerifier) getContext().getDefaultVerifier()).getLocalSecrets().put(user.getEmail(), user.getPassword().toCharArray());
 			
@@ -54,20 +62,24 @@ public class UsersRegistryJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, InvalidUserEmailException.class);
-		}    		
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
+		}		
     }
     
     @Put
     public String updateUser(String payload) throws ParseException, InvalidUserEmailException {
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
 		
 		User user = gson.fromJson(payload, User.class);
 		try {
 			if (!getClientInfo().getUser().getIdentifier().equals(user.getEmail()))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			urapi.update(user);
+			UsersAccessObject.updateUser(user);
 			
 			((MapVerifier) getContext().getDefaultVerifier()).getLocalSecrets().put(user.getEmail(), user.getPassword().toCharArray());
 			
@@ -78,7 +90,12 @@ public class UsersRegistryJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
-		}
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
+		}	
     }
     
 //    @Delete

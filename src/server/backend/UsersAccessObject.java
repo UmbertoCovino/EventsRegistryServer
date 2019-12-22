@@ -3,7 +3,9 @@ package server.backend;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 
+import commons.Event;
 import commons.GenericSQLException;
 import commons.InvalidUserEmailException;
 import commons.User;
@@ -43,6 +45,30 @@ public class UsersAccessObject {
 				String photoPath = rs.getString("photo_path");
 							
 				user = new User(name, surname, email, photoPath);
+			} else
+				throw new InvalidUserEmailException("Inexistent user email: " + email);
+			
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+		
+		return user;
+	}
+	
+	public synchronized static User getUserWithPassword(String email) throws InvalidUserEmailException, GenericSQLException {
+		User user = null;
+		
+		try {
+			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
+
+			if (rs.next()) {
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String password = rs.getString("password");
+				String photoPath = rs.getString("photo_path");
+				
+				user = new User(name, surname, email, password, photoPath);
 			} else
 				throw new InvalidUserEmailException("Inexistent user email: " + email);
 			
@@ -130,6 +156,39 @@ public class UsersAccessObject {
 		return photoPath;
 	}
 	
+	public synchronized static ArrayList<Event> getUserEvents(String email) throws InvalidUserEmailException, GenericSQLException {
+		ArrayList<Event> events = new ArrayList<>();
+		
+		User user = getUser(email);
+		
+		try {
+			ResultSet rs = DBManager.executeQuery("select * "
+											   + "from events "
+											   + "where email = '" + email + "' "
+											   + "order by start_date;");
+			
+			while (rs.next()) {
+				int id = rs.getInt("id");
+				String title = rs.getString("title");
+				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
+				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
+				String description = rs.getString("description");
+				String photoPath = rs.getString("photo_path");
+				String ownerEmail = rs.getString("user_owner_email");
+				
+				Event event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, user);
+				
+				events.add(event);
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+		
+		return events;
+	}
+	
 	public synchronized static ArrayList<User> getUsers() throws GenericSQLException {
 		ArrayList<User> users = new ArrayList<>();
 		
@@ -163,7 +222,7 @@ public class UsersAccessObject {
 	
 	// ADDERS -----------------------------------------------------------------------------------------------
 
-	public synchronized static int addUser(User user) throws InvalidUserEmailException, GenericSQLException {
+	public synchronized static void addUser(User user) throws InvalidUserEmailException, GenericSQLException {
 		int result = 0;
 		
 		try {
@@ -184,19 +243,8 @@ public class UsersAccessObject {
 			throw new GenericSQLException(e.getMessage());
 		}
 
-		try {
-			if (result == 1) {
-				ResultSet rs = DBManager.executeQuery("select last_insert_id() as last_inserted_id;");
-				
-				if (rs.next()) {
-					return rs.getInt("last_inserted_id");
-				} else
-					return -1;
-			} else
-				throw new GenericSQLException("An error occurred while adding user to DB.");
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
+		if (result != 1)
+			throw new GenericSQLException("An error occurred while adding user to DB.");
 	}
 	
 	

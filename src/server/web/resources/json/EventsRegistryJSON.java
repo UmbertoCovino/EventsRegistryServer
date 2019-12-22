@@ -28,9 +28,12 @@ public class EventsRegistryJSON extends ServerResource {
 		
 		ArrayList<Event> events = null;
 		try {
-			events = EventsAccessObject.getEventsOrderedByStartDateAsc();
+			events = EventsAccessObject.getEvents();
 		} catch (GenericSQLException e) {
-			e.printStackTrace();
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
 		
 		return gson.toJson(events.toArray(new Event[events.size()]), Event[].class);

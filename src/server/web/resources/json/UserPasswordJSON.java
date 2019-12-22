@@ -8,25 +8,25 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 
 import commons.ErrorCodes;
+import commons.GenericSQLException;
 import commons.InvalidUserEmailException;
 import commons.UnauthorizedUserException;
-import commons.User;
-import server.backend.wrapper.UsersRegistryAPI;
+import server.backend.UsersAccessObject;
 
 public class UserPasswordJSON extends ServerResource {
 
 	@Get
     public String getPassword() {
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
+		String email = getAttribute("email");
 		
 		try {
-			if (!getClientInfo().getUser().getIdentifier().equals(getAttribute("email")))
+			if (!getClientInfo().getUser().getIdentifier().equals(email))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			User user = urapi.get(getAttribute("email"));
+			String password = UsersAccessObject.getUserPassword(email);
 		
-			return gson.toJson(user.getPassword(), String.class);   	
+			return gson.toJson(password, String.class);   	
 		} catch (InvalidUserEmailException e) {
 			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);
 			setStatus(status);
@@ -37,23 +37,28 @@ public class UserPasswordJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
     }
     
     @Put
     public String updatePassword(String payload) {
 		Gson gson = new Gson();
-		UsersRegistryAPI urapi = UsersRegistryAPI.instance();
+		String email = getAttribute("email");
 		
 		try {
-			if (!getClientInfo().getUser().getIdentifier().equals(getAttribute("email")))
+			if (!getClientInfo().getUser().getIdentifier().equals(email))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
-			User user = urapi.get(getAttribute("email"));
-			user.setPassword(gson.fromJson(payload, String.class));
-			urapi.update(user);
+			String password = gson.fromJson(payload, String.class);
 			
-			return gson.toJson("Password updated for user with email " + getAttribute("email") + ".", String.class);
+			UsersAccessObject.updateUserPassword(email, password);
+			
+			return gson.toJson("Password updated for user with email " + email + ".", String.class);
 		} catch (InvalidUserEmailException e) {
 			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);
 			setStatus(status);
@@ -64,6 +69,11 @@ public class UserPasswordJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, UnauthorizedUserException.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+			
+			return gson.toJson(e, GenericSQLException.class);
 		}
 	}
 }

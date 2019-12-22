@@ -52,7 +52,7 @@ public class EventDescriptionJSON extends ServerResource {
 			
 			EventsAccessObject.updateEventDescription(id, description);
 			
-			return gson.toJson("Description updated for event with id " + getAttribute("id") + ".", String.class);
+			return gson.toJson("Description updated for event with id " + id + ".", String.class);
 		} catch (InvalidEventIdException e) {
 			Status status = new Status(ErrorCodes.INVALID_EVENT_ID);
 			setStatus(status);

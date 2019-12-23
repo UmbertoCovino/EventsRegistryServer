@@ -8,10 +8,10 @@ import java.util.Date;
 
 import commons.Event;
 import commons.User;
-import exceptions.GenericSQLException;
-import exceptions.InvalidEventIdException;
-import exceptions.InvalidUserEmailException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.VoidClassFieldException;
 
 public class EventsAccessObject {
 	public static final SimpleDateFormat DATETIME_SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -213,6 +213,33 @@ public class EventsAccessObject {
 		return owner;
 	}
 	
+	public synchronized static ArrayList<User> getEventSubscribers(int id) throws GenericSQLException {
+		ArrayList<User> users = new ArrayList<>();
+		
+		try {
+			ResultSet rs = DBManager.executeQuery("select * "
+											   + "from users join events_users_participations on email = user_email "
+											   + "where event_id = " + id + ";");
+			
+			while (rs.next()) {
+				String email = rs.getString("email");
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String photoPath = rs.getString("photo_path");
+				
+				User user = new User(name, surname, email, photoPath);
+				
+				users.add(user);
+			}
+			
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+		
+		return users;
+	}
+	
 	public synchronized static ArrayList<Event> getEvents() throws GenericSQLException {
 		ArrayList<Event> events = new ArrayList<>();
 		
@@ -382,9 +409,9 @@ public class EventsAccessObject {
 	public synchronized static int addEvent(Event event) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
 		
-		if (event.getId() == null)
+		/*if (event.getId() == null)
 			throw new VoidClassFieldException("INTERNAL SERVER ERROR. The event passed does not have the id. Set it before calling this method.");
-		else if (event.getOwnerEmail() == null)
+		else */if (event.getOwnerEmail() == null)
 			throw new VoidClassFieldException("INTERNAL SERVER ERROR. The event passed does not have the owner email. Set it before calling this method.");
 		else if (event.getTitle() == null || event.getTitle().equals("")
 			  || event.getStartDate() == null
@@ -405,7 +432,7 @@ public class EventsAccessObject {
 													       + "'" + event.getFormattedStartDate() + "', "
 														   + "'" + event.getFormattedEndDate() + "', "
 														   + "'" + event.getDescription() + "', "
-														   + ((event.getPhotoPath() != null) ? "'" + event.getPhotoPath() + "', " : "null")
+														   + ((event.getPhotoPath() != null) ? "'" + event.getPhotoPath() + "', " : "null, ")
 														   + "'" + event.getOwnerEmail() + "');");
 			}
 		} catch (SQLException e) {
@@ -426,6 +453,40 @@ public class EventsAccessObject {
 		} catch (SQLException e) {
 			throw new GenericSQLException(e.getMessage());
 		}
+	}
+	
+	public synchronized static int addEventSubscriber(int id, String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException, InvalidEventIdException {
+		int result = 0;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		
+		try {
+			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
+			
+			if (rs.next()) {
+				if (rs.getInt("events_number") == 0)
+					throw new InvalidEventIdException("Inexistent event id: " + id);
+			
+				rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
+				
+				if (rs.next()) {
+					if (rs.getInt("users_number") == 0)
+						throw new InvalidUserEmailException("Inexistent user email: " + email);
+					
+					result = DBManager.executeUpdate("insert into events_users_participations "
+												   + "values (" + id + ", "
+														   + "'" + email + "');");
+				}
+			}
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+
+		if (result != 1)
+			throw new GenericSQLException("An error occurred while adding subscriber to DB.");
+		else
+			return result;
 	}
 	
 	
@@ -659,5 +720,38 @@ public class EventsAccessObject {
 			return 1;
 		else
 			throw new GenericSQLException("An error occurred while removing event in DB.");
+	}
+
+	public synchronized static int removeEventSubscriber(int id, String email) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException, InvalidUserEmailException {
+		int result = 0;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		
+		try {
+			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
+			
+			if (rs.next()) {
+				if (rs.getInt("events_number") == 0)
+					throw new InvalidEventIdException("Inexistent event id: " + id);
+			
+				rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
+				
+				if (rs.next()) {
+					if (rs.getInt("users_number") == 0)
+						throw new InvalidUserEmailException("Inexistent user email: " + email);
+					
+					result = DBManager.executeUpdate("delete from events_users_participations "
+												   + "where event_id = " + id + " and user_email = '" + email + "';");
+				}
+			}
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+		
+		if (result == 1)
+			return 1;
+		else
+			throw new GenericSQLException("An error occurred while removing event subscriber in DB.");
 	}
 }

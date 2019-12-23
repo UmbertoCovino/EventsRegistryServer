@@ -8,18 +8,18 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidUserEmailException;
-import exceptions.JsonParsingException;
-import exceptions.UnauthorizedUserException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.JsonParsingException;
+import commons.exceptions.UnauthorizedUserException;
+import commons.exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class UserSurnameJSON extends ServerResource {
 
-	@Get
+	@Get("json")
     public String getSurname() {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -45,7 +45,7 @@ public class UserSurnameJSON extends ServerResource {
 		}
     }
     
-    @Put
+    @Put("json")
     public String updateSurname(String payload) {
     		Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");

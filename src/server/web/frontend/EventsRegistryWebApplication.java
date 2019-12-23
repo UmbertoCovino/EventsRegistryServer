@@ -35,9 +35,9 @@ import com.google.gson.stream.JsonWriter;
 
 import commons.Event;
 import commons.User;
-import exceptions.GenericSQLException;
-import exceptions.InvalidUserEmailException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.VoidClassFieldException;
 import server.web.resources.json.EventsSizeJSON;
 import server.backend.DBManager;
 import server.backend.EventsAccessObject;
@@ -146,7 +146,8 @@ public class EventsRegistryWebApplication extends Application {
 		router.attach("/eventsRegistry/events/{id}/endDate", getGuardExcludingGet(EventEndDateJSON.class));			// not used
 		router.attach("/eventsRegistry/events/{id}/description", getGuardExcludingGet(EventDescriptionJSON.class));	// not used
 		router.attach("/eventsRegistry/events/{id}/photo", getGuardExcludingGet(EventPhotoJSON.class));
-		router.attach("/eventsRegistry/events/{id}/userOwner", getGuardExcludingGet(EventUserOwnerJSON.class));				// not used
+		router.attach("/eventsRegistry/events/{id}/userOwner", getGuardExcludingGet(EventUserOwnerJSON.class));				// not used				// not used
+		router.attach("/eventsRegistry/events/{id}/subscribers", getGuard(EventSubscribersJSON.class));	
 		
 		router.attach("/eventsRegistry/users", getGuardExcludingGetAndPost(UsersJSON.class));
 		router.attach("/eventsRegistry/users/size", UsersSizeJSON.class);									// not used
@@ -156,6 +157,7 @@ public class EventsRegistryWebApplication extends Application {
 		router.attach("/eventsRegistry/users/{email}/password", getGuard(UserPasswordJSON.class));					// not used
 		router.attach("/eventsRegistry/users/{email}/photo", getGuardExcludingGet(UserPhotoJSON.class));
 		router.attach("/eventsRegistry/users/{email}/events", getGuard(UserEventsJSON.class));						// not used
+		router.attach("/eventsRegistry/users/{email}/telegram", UserTelegramJSON.class);
 		
 //		try {
 //			urapi.remove("ciao@er.it");
@@ -225,7 +227,6 @@ public class EventsRegistryWebApplication extends Application {
 			BufferedReader br = new BufferedReader(new FileReader("settings.json"));
 			settings = gson.fromJson(br, Settings.class);
 			br.close();
-
 			
 			if (settings.hasSomeVoidField()) {
 				System.err.println("Settings have some void field! Please, fill all fields.");
@@ -236,7 +237,6 @@ public class EventsRegistryWebApplication extends Application {
 			System.err.println("Settings file not found!");
 			System.exit(-1);
 		}
-		
 		
 		ROOT_DIR_FOR_WEB_STATIC_FILES = "file:" + File.separator + File.separator + System.getProperty("user.dir") + File.separator + settings.webDir;
 		createDirectoryIfNotExists(System.getProperty("user.dir") + File.separator + settings.webDir);
@@ -253,6 +253,11 @@ public class EventsRegistryWebApplication extends Application {
 		DBManager.DB_NAME = settings.dbName;
 		DBManager.DB_USER = settings.dbUser;
 		DBManager.DB_PASSWORD = settings.dbPassword;
+		
+		if (!DBManager.isConnectionEstablished()) {
+			System.err.println("MySQL server not available! Ensure that it is running.");
+			System.exit(-1);
+		}
 		
 		try {
 			// Create a new Component
@@ -275,18 +280,18 @@ public class EventsRegistryWebApplication extends Application {
 		
 		
 		// Launch TelegramBot --------------------------
-//		// Initialize Api Context
-//        ApiContextInitializer.init();
-//
-//        // Instantiate Telegram Bots API
-//        TelegramBotsApi botsApi = new TelegramBotsApi();
-//
-//        // Register our bot
-//        try {
-//            botsApi.registerBot(new TelegramBot());
-//        } catch (TelegramApiException e) {
-//            e.printStackTrace();
-//        }
+		// Initialize Api Context
+        ApiContextInitializer.init();
+
+        // Instantiate Telegram Bots API
+        TelegramBotsApi botsApi = new TelegramBotsApi();
+
+        // Register our bot
+        try {
+            botsApi.registerBot(new TelegramBot());
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
 		// End TelegramBot ------------------------------
         
 		
@@ -368,7 +373,7 @@ public class EventsRegistryWebApplication extends Application {
 			try {
 				return Event.DATETIME_SDF.parse(in.nextString());
 			} catch (ParseException e) {
-				throw new IOException("Invalid format for datetime: correct one is 'yyyy-MM-dd HH:mm'.");
+				throw new IOException("Invalid format for datetime: correct one is 'yyyy-MM-dd HH:mm:ss'.");
 			}
 		}
 	}

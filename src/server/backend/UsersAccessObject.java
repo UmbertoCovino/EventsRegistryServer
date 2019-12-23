@@ -7,9 +7,9 @@ import java.util.Date;
 
 import commons.Event;
 import commons.User;
-import exceptions.GenericSQLException;
-import exceptions.InvalidUserEmailException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.VoidClassFieldException;
 
 public class UsersAccessObject {
 	
@@ -183,7 +183,7 @@ public class UsersAccessObject {
 		try {
 			ResultSet rs = DBManager.executeQuery("select * "
 											   + "from events "
-											   + "where email = '" + email + "' "
+											   + "where user_owner_email = '" + email + "' "
 											   + "order by start_date;");
 			
 			while (rs.next()) {
@@ -306,8 +306,6 @@ public class UsersAccessObject {
 			throw new VoidClassFieldException("The name passed cannot be null or empty.");
 		else if (user.getSurname() == null || user.getSurname().equals(""))
 			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
-		else if (user.getPhotoPath() == null || user.getPhotoPath().equals(""))
-			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + user.getEmail() + "';");
@@ -318,9 +316,9 @@ public class UsersAccessObject {
 				
 				result = DBManager.executeUpdate("update users "
 											   + "set name = '" + user.getName() + "', "
-												   + "surname = '" + user.getSurname() + "', "
-												   + ((user.getPassword() != null) ? "password = '" + user.getPassword() + "', " : "")
-												   + "photo_path = '" + user.getPhotoPath() + "' "
+												   + "surname = '" + user.getSurname() + "' "
+												   + ((user.getPassword() != null && !user.getSurname().equals("")) ? ", password = '" + user.getPassword() + "' " : "")
+												// + ((user.getPhotoPath() != null && !user.getPhotoPath().equals("")) ? ", photo_path = '" + user.getPhotoPath() + "' " : "")
 											   + "where email = '" + user.getEmail() + "';");
 			}
 		} catch (SQLException e) {

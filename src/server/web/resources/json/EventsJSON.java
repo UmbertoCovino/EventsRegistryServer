@@ -13,19 +13,19 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import commons.Event;
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidEventIdException;
-import exceptions.InvalidUserEmailException;
-import exceptions.JsonParsingException;
-import exceptions.UnauthorizedUserException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.JsonParsingException;
+import commons.exceptions.UnauthorizedUserException;
+import commons.exceptions.VoidClassFieldException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventsJSON extends ServerResource {
 	
-	@Get
+	@Get("json")
 	public String getEvents() throws ParseException {   	
 		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -42,7 +42,7 @@ public class EventsJSON extends ServerResource {
 		return gson.toJson(events.toArray(new Event[events.size()]), Event[].class);
 	}
     
-    @Post
+    @Post("json")
     public String addEvent(String payload) throws ParseException, InvalidUserEmailException {   	
     		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -66,7 +66,7 @@ public class EventsJSON extends ServerResource {
 			EventsAccessObject.updateEventPhotoPath(lastInsertedId, photoPath);
 			
 //			return gson.toJson("Event with id " + event.getId() + " added.", String.class);
-			return gson.toJson(lastInsertedId, String.class);
+			return gson.toJson(lastInsertedId, int.class);
 //			return gson.toJson(event, Event.class);
 		} catch (InvalidEventIdException e) {
 			Status status = new Status(ErrorCodes.INVALID_EVENT_ID);
@@ -86,7 +86,7 @@ public class EventsJSON extends ServerResource {
 		}
     }
     
-    @Put
+    @Put("json")
     public String updateEvent(String payload) throws ParseException, InvalidEventIdException {
     		Gson gson = EventsRegistryWebApplication.GSON;
     		
@@ -126,7 +126,7 @@ public class EventsJSON extends ServerResource {
 		}
     }
     
-//    @Delete
+//    @Delete("json")
 //    public String deleteAll() {
 //		//to be implemented
 //		

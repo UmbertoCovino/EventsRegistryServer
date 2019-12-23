@@ -16,16 +16,16 @@ import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
 
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidEventIdException;
-import exceptions.UnauthorizedUserException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.UnauthorizedUserException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventPhotoJSON extends ServerResource {
 	
-	@Get
+	@Get("jpeg")
     public Representation getPhoto() throws ResourceException {
 		@SuppressWarnings("unused")
 		Gson gson = EventsRegistryWebApplication.GSON;
@@ -61,7 +61,7 @@ public class EventPhotoJSON extends ServerResource {
 		}
     }
     
-    @Put
+    @Put("jpeg")
     public String updatePhoto(Representation entity) throws ResourceException {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));
@@ -77,7 +77,11 @@ public class EventPhotoJSON extends ServerResource {
 			try {
 				entity.write(new FileOutputStream(new File(EventsRegistryWebApplication.EVENTS_PHOTOS_DIRECTORY + photoPath)));
 			} catch (Exception e) {
-				throw new ResourceException(e);
+				Status status = new Status(ErrorCodes.RESOURCE_EXCEPTION);
+				setStatus(status);
+				
+				return gson.toJson(new ResourceException(e), ResourceException.class);
+//				throw new ResourceException(e);
 			}
 			
 //			return gson.toJson("Photo updated for event with id " + getAttribute("id") + ".", String.class);

@@ -11,21 +11,21 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 
 import commons.Event;
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidEventIdException;
-import exceptions.UnauthorizedUserException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.UnauthorizedUserException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventJSON extends ServerResource {
 	
-    @Get
+    @Get("json")
     public String getEvent() throws ParseException {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		
 		try {
-			Event event = EventsAccessObject.getEvent(Integer.parseInt(getAttribute("id"))).clone();
+			Event event = EventsAccessObject.getEvent(Integer.parseInt(getAttribute("id")));
 			
 			return gson.toJson(event, Event.class);
 		} catch (InvalidEventIdException e) {
@@ -41,7 +41,7 @@ public class EventJSON extends ServerResource {
 		}
     }
     
-    @Delete
+    @Delete("json")
     public String deleteEvent() {
 		Gson gson = EventsRegistryWebApplication.GSON;
     		int id = Integer.valueOf(getAttribute("id"));

@@ -1,4 +1,4 @@
-package exceptions;
+package commons.exceptions;
 
 public class VoidClassFieldException extends Exception {
 	private static final long serialVersionUID = -2161808079957292179L;

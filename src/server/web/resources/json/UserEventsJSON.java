@@ -11,18 +11,18 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import commons.Event;
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidEventIdException;
-import exceptions.InvalidUserEmailException;
-import exceptions.UnauthorizedUserException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.UnauthorizedUserException;
+import commons.exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class UserEventsJSON extends ServerResource {
 	
-	@Get
+	@Get("json")
 	public String getEvents() throws ParseException, JsonSyntaxException, InvalidEventIdException {   	
 		Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");

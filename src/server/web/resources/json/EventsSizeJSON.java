@@ -8,14 +8,14 @@ import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
 
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventsSizeJSON extends ServerResource {
 	
-	@Get
+	@Get("json")
 	public String getSize() throws ParseException {    	
 		Gson gson = EventsRegistryWebApplication.GSON;
 		

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 5px;
+  text-align: left;    
+}
+.uriTd {
+  width: 40px;
+}
+.monospaced {
+  font-family:monospace;
+}
+</style>
+</head>
+<body>
+
+<h2>EventsRegistry REST API Resources</h2>
+
+<p>At the URI <span class="monospaced">.../eventsRegistry/web</span> you can find some static web pages.</p>
+
+<table>
+  <tr><th>Page</th><th>Description</th></tr>
+  <tr><td><span class="monospaced">index.html</span></td><td>This help web page.</td></tr>
+</table>
+
+<p>Below all the URIs that compose the Web API.</p>
+
+<h3>Events Resources</h3>
+
+<table>
+  <tr><th colspan="2">EventsJSON</th></tr>
+  <tr><td>URI</td><td><span class="monospaced">.../eventsRegistry/events</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>POST</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventsSizeJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/size</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventsAfterDateJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/after/{date}</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventsBeforeDateJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/before/{date}</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventsFromDateToDateJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/between/{from}/{to}</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/{id}</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>DELETE</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventTitleJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/{id}/title</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventStartDateJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/{id}/startDate</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventEndDateJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/{id}/endDate</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventDescriptionJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/{id}/description</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventPhotoJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/{id}/photo</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">EventUserOwnerJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/events/{id}/userOwner</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <!--tr><td>PUT</td><td>...</td></tr-->
+</table>
+
+<br>
+
+<h3>Users Resources</h3>
+
+<table>
+  <tr><th colspan="2">UsersJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/users</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>POST</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">UsersSizeJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/users/size</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">UserJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/users/{email}</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>POST</td><td>...</td></tr>
+  <tr><td>DELETE</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">UserNameJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/users/{email}/name</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">UserSurnameJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/users/{email}/surname</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">UserPasswordJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/users/{email}/password</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">UserPhotoJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/users/{email}/photo</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+<table>
+  <tr><th colspan="2">UserEventsJSON</th></tr>
+  <tr><td class="uriTd">URI</td><td><span class="monospaced">.../eventsRegistry/users/{email}/events</span></td></tr>
+  <tr><td>GET</td><td>...</td></tr>
+  <tr><td>PUT</td><td>...</td></tr>
+</table>
+
+<br>
+
+</body>
+</html>

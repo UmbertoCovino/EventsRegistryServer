@@ -9,19 +9,19 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import commons.User;
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidEventIdException;
-import exceptions.InvalidUserEmailException;
-import exceptions.JsonParsingException;
-import exceptions.UnauthorizedUserException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.JsonParsingException;
+import commons.exceptions.UnauthorizedUserException;
 import server.backend.EventsAccessObject;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventUserOwnerJSON extends ServerResource {
 	
-	@Get
+	@Get("json")
     public String getUser() throws InvalidUserEmailException {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -43,7 +43,7 @@ public class EventUserOwnerJSON extends ServerResource {
     }
     
 	// questo metodo non so se ha senso: aggiornare l'utente associato ad un evento attraverso le uri dell'evento stesso?
-//    @Put
+//    @Put("json")
 //    public String updateUser(String payload) {
 //		Gson gson = new Gson();
 //		int id = Integer.valueOf(getAttribute("id"));

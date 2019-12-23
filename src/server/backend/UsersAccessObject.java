@@ -7,9 +7,9 @@ import java.util.Date;
 
 import commons.Event;
 import commons.User;
-import exceptions.GenericSQLException;
-import exceptions.InvalidUserEmailException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.VoidClassFieldException;
 
 public class UsersAccessObject {
 	

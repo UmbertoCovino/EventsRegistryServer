@@ -31,6 +31,10 @@ public class DBManager {
 			e.printStackTrace();
 		}
 	}
+	
+	public static boolean isConnectionEstablished() {
+		return !(DBManager.getInstance().connection == null);
+	}
 
 	private static synchronized DBManager getInstance() {
 		if (instance == null)
@@ -57,10 +61,12 @@ public class DBManager {
 	
 	
 	public static synchronized ResultSet executeQuery(String query) throws SQLException {
+//		System.err.println(query); // debug
 		return DBManager.getInstance().statement.executeQuery(query);
 	}
 	
 	public static synchronized int executeUpdate(String query) throws SQLException {
+//		System.err.println(query); // debug
 		return DBManager.getInstance().statement.executeUpdate(query);
 	}
 }

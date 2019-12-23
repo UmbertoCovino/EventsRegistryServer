@@ -8,18 +8,18 @@ import org.restlet.resource.ServerResource;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidEventIdException;
-import exceptions.JsonParsingException;
-import exceptions.UnauthorizedUserException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.JsonParsingException;
+import commons.exceptions.UnauthorizedUserException;
+import commons.exceptions.VoidClassFieldException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class EventDescriptionJSON extends ServerResource {
 	
-	@Get
+	@Get("json")
     public String getDescription() {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -40,7 +40,7 @@ public class EventDescriptionJSON extends ServerResource {
 		}
     }
     
-    @Put
+    @Put("json")
     public String updateDescription(String payload) {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));

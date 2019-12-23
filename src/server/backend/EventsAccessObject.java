@@ -8,10 +8,10 @@ import java.util.Date;
 
 import commons.Event;
 import commons.User;
-import exceptions.GenericSQLException;
-import exceptions.InvalidEventIdException;
-import exceptions.InvalidUserEmailException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.VoidClassFieldException;
 
 public class EventsAccessObject {
 	public static final SimpleDateFormat DATETIME_SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -382,9 +382,9 @@ public class EventsAccessObject {
 	public synchronized static int addEvent(Event event) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
 		int result = 0;
 		
-		if (event.getId() == null)
+		/*if (event.getId() == null)
 			throw new VoidClassFieldException("INTERNAL SERVER ERROR. The event passed does not have the id. Set it before calling this method.");
-		else if (event.getOwnerEmail() == null)
+		else */if (event.getOwnerEmail() == null)
 			throw new VoidClassFieldException("INTERNAL SERVER ERROR. The event passed does not have the owner email. Set it before calling this method.");
 		else if (event.getTitle() == null || event.getTitle().equals("")
 			  || event.getStartDate() == null
@@ -405,7 +405,7 @@ public class EventsAccessObject {
 													       + "'" + event.getFormattedStartDate() + "', "
 														   + "'" + event.getFormattedEndDate() + "', "
 														   + "'" + event.getDescription() + "', "
-														   + ((event.getPhotoPath() != null) ? "'" + event.getPhotoPath() + "', " : "null")
+														   + ((event.getPhotoPath() != null) ? "'" + event.getPhotoPath() + "', " : "null, ")
 														   + "'" + event.getOwnerEmail() + "');");
 			}
 		} catch (SQLException e) {

@@ -14,18 +14,18 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import commons.User;
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidUserEmailException;
-import exceptions.JsonParsingException;
-import exceptions.UnauthorizedUserException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.JsonParsingException;
+import commons.exceptions.UnauthorizedUserException;
+import commons.exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class UsersJSON extends ServerResource {
 
-	@Get
+	@Get("json")
 	public String getUsers() throws ParseException, InvalidUserEmailException {   	
 		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -42,7 +42,7 @@ public class UsersJSON extends ServerResource {
 		return gson.toJson(users.toArray(new User[users.size()]), User[].class);
 	}
     
-    @Post
+    @Post("json")
     public String addUser(String payload) throws ParseException {   	
     		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -88,7 +88,7 @@ public class UsersJSON extends ServerResource {
 		}		
     }
     
-    @Put
+    @Put("json")
     public String updateUser(String payload) throws ParseException, InvalidUserEmailException {
     		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -130,7 +130,7 @@ public class UsersJSON extends ServerResource {
 		}	
     }
     
-//    @Delete
+//    @Delete("json")
 //    public String deleteAll() {
 //		//to be implemented
 //		

@@ -14,18 +14,18 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import commons.User;
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidUserEmailException;
-import exceptions.JsonParsingException;
-import exceptions.UnauthorizedUserException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.JsonParsingException;
+import commons.exceptions.UnauthorizedUserException;
+import commons.exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class UserJSON extends ServerResource {
 
-	@Get
+	@Get("json")
     public String getUser() throws ParseException {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		
@@ -51,7 +51,7 @@ public class UserJSON extends ServerResource {
 		}
     }
 	
-	@Post
+	@Post("json")
     public String getUserIfPasswordIsCorrect(String payload) throws ParseException {
 		Gson gson = EventsRegistryWebApplication.GSON;
 
@@ -90,7 +90,7 @@ public class UserJSON extends ServerResource {
 		}
     }
     
-    @Delete
+    @Delete("json")
     public String deleteUser() {
     		Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");

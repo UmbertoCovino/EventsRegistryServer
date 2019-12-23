@@ -137,13 +137,4 @@ public class Event implements Serializable {
 	public String toString() {
 		return "Event [id=" + id + ", title=" + title + ", startDate=" + getFormattedStartDate() + ", endDate=" + getFormattedEndDate() + ", description=" + description + ", photoPath=" + photoPath + ", owner=" + owner + "]";
 	}
-	
-	public Event clone() {
-		Event event = new Event(title, startDate, endDate, description);
-		event.setId(id);
-		event.setPhotoPath(photoPath);
-		event.setOwnerEmail(ownerEmail);
-		
-		return event;
-	}
 }

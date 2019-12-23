@@ -17,9 +17,9 @@ import com.google.gson.Gson;
 
 import commons.Event;
 import commons.User;
-import exceptions.ErrorCodes;
-import exceptions.InvalidEventIdException;
-import exceptions.InvalidUserEmailException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.InvalidUserEmailException;
 
 
 public class Test1 {

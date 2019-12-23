@@ -16,17 +16,17 @@ import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
 
-import exceptions.ErrorCodes;
-import exceptions.GenericSQLException;
-import exceptions.InvalidUserEmailException;
-import exceptions.UnauthorizedUserException;
-import exceptions.VoidClassFieldException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.GenericSQLException;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.UnauthorizedUserException;
+import commons.exceptions.VoidClassFieldException;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
 public class UserPhotoJSON extends ServerResource {
 
-	@Get
+	@Get("jpeg")
     public Representation getPhoto() throws ResourceException {
 		try {
 			String photoPath = UsersAccessObject.getUserPhotoPath(getAttribute("email"));
@@ -64,7 +64,7 @@ public class UserPhotoJSON extends ServerResource {
 		}
     }
     
-    @Put
+    @Put("jpeg")
     public String updatePhoto(Representation entity) throws ResourceException {
     		Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");

@@ -9,8 +9,8 @@ import org.restlet.resource.ServerResource;
 
 import com.google.gson.Gson;
 
-import commons.ErrorCodes;
-import commons.InvalidUserEmailException;
+import commons.exceptions.ErrorCodes;
+import commons.exceptions.InvalidUserEmailException;
 import commons.User;
 import server.backend.TelegramUsersRegistry;
 import server.backend.wrapper.UsersRegistryAPI;

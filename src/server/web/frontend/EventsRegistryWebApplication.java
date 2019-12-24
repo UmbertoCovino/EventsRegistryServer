@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.restlet.Application;
@@ -34,18 +31,17 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import commons.Event;
-import commons.User;
 import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidUserEmailException;
 import commons.exceptions.VoidClassFieldException;
 import server.web.resources.json.EventsSizeJSON;
 import server.backend.DBManager;
-import server.backend.EventsAccessObject;
 import server.backend.TelegramBot;
 import server.backend.UsersAccessObject;
 import server.web.resources.json.EventJSON;
 import server.web.resources.json.EventPhotoJSON;
 import server.web.resources.json.EventStartDateJSON;
+import server.web.resources.json.EventSubscribersJSON;
 import server.web.resources.json.EventDescriptionJSON;
 import server.web.resources.json.EventEndDateJSON;
 import server.web.resources.json.EventTitleJSON;
@@ -60,6 +56,7 @@ import server.web.resources.json.UserNameJSON;
 import server.web.resources.json.UserPasswordJSON;
 import server.web.resources.json.UserPhotoJSON;
 import server.web.resources.json.UserSurnameJSON;
+import server.web.resources.json.UserTelegramJSON;
 import server.web.resources.json.UsersJSON;
 import server.web.resources.json.UsersSizeJSON;
 
@@ -302,6 +299,7 @@ public class EventsRegistryWebApplication extends Application {
         //eventualTestingPart();
 	}
 
+	@SuppressWarnings("unused")
 	private static void eventualTestingPart() {
 		try {
 //			EventsAccessObject.addEvent(new Event("provaT", new Date(), new Date(), "provaD", "path", "email"));

@@ -9,7 +9,8 @@ public class ErrorCodes {
 					        JSON_PARSING = 952,
 					        DATE_PARSING = 953,
 					        URI_ENCODING = 954,
-					        RESOURCE_EXCEPTION = 955;
+					        RESOURCE_EXCEPTION = 955,
+					        INVALID_PARTICIPATION = 956;
 	
 	public static final String INVALID_EVENT_ID_DESCRIPTION = "Invalid Event Id",
 							  INVALID_USER_EMAIL_DESCRIPTION = "Invalid User Email",
@@ -19,5 +20,6 @@ public class ErrorCodes {
 						      JSON_PARSING_EXC_DESCRIPTION = "Json Parsing Error",
 							  DATE_PARSING_EXC_DESCRIPTION = "Date Parsing Error",
 							  URI_ENCODING_EXC_DESCRIPTION = "Uri Encoding Error",
-							  RESOURCE_EXC_DESCRIPTION = "Resource Error";
+							  RESOURCE_EXC_DESCRIPTION = "Resource Error",
+							  INVALID_PARTICIPATION_DESCRIPTION = "Invalid Participation";
 }

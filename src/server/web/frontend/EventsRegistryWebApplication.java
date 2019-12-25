@@ -144,7 +144,8 @@ public class EventsRegistryWebApplication extends Application {
 		router.attach("/eventsRegistry/events/{id}/description", getGuardExcludingGet(EventDescriptionJSON.class));	// not used
 		router.attach("/eventsRegistry/events/{id}/photo", getGuardExcludingGet(EventPhotoJSON.class));
 		router.attach("/eventsRegistry/events/{id}/userOwner", getGuardExcludingGet(EventUserOwnerJSON.class));				// not used				// not used
-		router.attach("/eventsRegistry/events/{id}/subscribers", getGuard(EventSubscribersJSON.class));	
+		router.attach("/eventsRegistry/events/{id}/subscribers", getGuardExcludingGet(EventSubscribersJSON.class));				// not used
+		router.attach("/eventsRegistry/events/{id}/subscribers/{email}", getGuardExcludingGet(EventSubscribersJSON.class));	
 		
 		router.attach("/eventsRegistry/users", getGuardExcludingGetAndPost(UsersJSON.class));
 		router.attach("/eventsRegistry/users/size", UsersSizeJSON.class);									// not used

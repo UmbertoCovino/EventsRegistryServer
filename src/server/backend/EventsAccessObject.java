@@ -10,6 +10,7 @@ import commons.Event;
 import commons.User;
 import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidEventIdException;
+import commons.exceptions.InvalidParticipationException;
 import commons.exceptions.InvalidUserEmailException;
 import commons.exceptions.VoidClassFieldException;
 
@@ -213,26 +214,33 @@ public class EventsAccessObject {
 		return owner;
 	}
 	
-	public synchronized static ArrayList<User> getEventSubscribers(int id) throws GenericSQLException {
+	public synchronized static ArrayList<User> getEventSubscribers(int id) throws GenericSQLException, InvalidEventIdException {
 		ArrayList<User> users = new ArrayList<>();
 		
 		try {
-			ResultSet rs = DBManager.executeQuery("select * "
-											   + "from users join events_users_participations on email = user_email "
-											   + "where event_id = " + id + ";");
+			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
 			
-			while (rs.next()) {
-				String email = rs.getString("email");
-				String name = rs.getString("name");
-				String surname = rs.getString("surname");
-				String photoPath = rs.getString("photo_path");
+			if (rs.next()) {
+				if (rs.getInt("events_number") == 0)
+					throw new InvalidEventIdException("Inexistent event id: " + id);
 				
-				User user = new User(name, surname, email, photoPath);
+				rs = DBManager.executeQuery("select * "
+										 + "from users join events_users_participations on email = user_email "
+										 + "where event_id = " + id + ";");
 				
-				users.add(user);
+				while (rs.next()) {
+					String email = rs.getString("email");
+					String name = rs.getString("name");
+					String surname = rs.getString("surname");
+					String photoPath = rs.getString("photo_path");
+					
+					User user = new User(name, surname, email, photoPath);
+					
+					users.add(user);
+				}
+				
+				rs.close();
 			}
-			
-			rs.close();
 		} catch (SQLException e) {
 			throw new GenericSQLException(e.getMessage());
 		}
@@ -722,7 +730,7 @@ public class EventsAccessObject {
 			throw new GenericSQLException("An error occurred while removing event in DB.");
 	}
 
-	public synchronized static int removeEventSubscriber(int id, String email) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException, InvalidUserEmailException {
+	public synchronized static int removeEventSubscriber(int id, String email) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException, InvalidUserEmailException, InvalidParticipationException {
 		int result = 0;
 
 		if (email == null || email.equals(""))
@@ -741,8 +749,15 @@ public class EventsAccessObject {
 					if (rs.getInt("users_number") == 0)
 						throw new InvalidUserEmailException("Inexistent user email: " + email);
 					
-					result = DBManager.executeUpdate("delete from events_users_participations "
-												   + "where event_id = " + id + " and user_email = '" + email + "';");
+					rs = DBManager.executeQuery("select count(*) as participations_number from events_users_participations where event_id = " + id + " and user_email = '" + email + "';");
+					
+					if (rs.next()) {
+						if (rs.getInt("participations_number") == 0)
+							throw new InvalidParticipationException("Inexistent participation id-email: " + id + "-" + email);
+						
+						result = DBManager.executeUpdate("delete from events_users_participations "
+						     						   + "where event_id = " + id + " and user_email = '" + email + "';");
+					}
 				}
 			}
 		} catch (SQLException e) {

@@ -78,7 +78,11 @@ public class UserPhotoJSON extends ServerResource {
 			try {
 				entity.write(new FileOutputStream(new File(EventsRegistryWebApplication.USERS_PHOTOS_DIRECTORY + photoPath)));
 			} catch (Exception e) {
-				throw new ResourceException(e);
+				Status status = new Status(ErrorCodes.RESOURCE_EXCEPTION);
+				setStatus(status);
+				
+				return gson.toJson(new ResourceException(e), ResourceException.class);
+//				throw new ResourceException(e);
 			}
 			
 //			return gson.toJson("Photo updated for user with email " + getAttribute("email") + ".", String.class);

@@ -1,3 +1,4 @@
+
 package server.web.frontend;
 
 import java.io.BufferedReader;
@@ -285,11 +286,13 @@ public class EventsRegistryWebApplication extends Application {
         TelegramBotsApi botsApi = new TelegramBotsApi();
 
         // Register our bot
+        TelegramBot telegram_bot = new TelegramBot();
         try {
-            botsApi.registerBot(new TelegramBot());
+            botsApi.registerBot(telegram_bot);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+        telegram_bot.startNotificationManager();
 		// End TelegramBot ------------------------------
         
 		

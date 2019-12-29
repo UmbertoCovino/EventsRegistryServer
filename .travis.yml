@@ -1,1 +1,10 @@
 language: java
+
+script: mvn install;
+   
+notifications:
+  email:
+    - angelocaporaso03@gmail.com
+    - upcovino@gmail.com
+  on_success: change
+  on_failure: always

@@ -48,15 +48,8 @@
   		<groupId>org.telegram</groupId>
 		<artifactId>telegrambots</artifactId>
 		<version>4.4.0.2</version>
-		<scope>runtime</scope>
 	</dependency>
-	<dependency>
-  		<groupId>org.telegram</groupId>
-		<artifactId>meta</artifactId>
-		<version>4.4.0.2</version>
-		<scope>runtime</scope>
-	</dependency>
-  	
+	  
   	<!-- JUnit 5 -->
   	
   </dependencies>

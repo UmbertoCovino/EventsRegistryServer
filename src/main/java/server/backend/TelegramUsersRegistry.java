@@ -1,10 +1,10 @@
-package server.backend;
+package main.java.server.backend;
 
 import java.util.TreeMap;
 
-import commons.exceptions.InvalidUserEmailException;
-import commons.exceptions.InvalidUserTokenException;
-import commons.User;
+import main.java.commons.exceptions.InvalidUserEmailException;
+import main.java.commons.exceptions.InvalidUserTokenException;
+import main.java.commons.User;
 
 public class TelegramUsersRegistry {
 	private TreeMap<Integer, User> token_map;
@@ -66,7 +66,7 @@ public class TelegramUsersRegistry {
 
 		if (chat_id != null)
 			return chat_id;
-		else return null;
+		else return (long) 0;
 	}
 	
 	public synchronized void addChatIdByEmail(String email, Long chat_id) throws InvalidUserEmailException {

@@ -1,4 +1,4 @@
-package server.backend;
+package main.java.server.backend;
 
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,9 +10,9 @@ import java.util.Date;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import commons.Event;
-import commons.User;
-import commons.exceptions.InvalidUserEmailException;
+import main.java.commons.Event;
+import main.java.commons.User;
+import main.java.commons.exceptions.InvalidUserEmailException;
 /*
  * deep-linking telegram
  * https://telegram.me/EventsAppBot?/start=<token> the bot will receive a start string with payload (in our app the user's id)
@@ -82,22 +82,22 @@ public class TelegramBot extends TelegramLongPollingBot {
     				Date today = new Date();
     				
     				for(Event event: events) {
-    					
     					// notifica tutti gli utenti che sono interessati ad eventi che si terranno in giornata
 
     					if((event.getStartDate().getTime() - today.getTime()) <= 86400000) {	// 1 day  
-
     						
     						ArrayList<User> subscribers = EventsAccessObject.getEventSubscribers(event.getId());
     						
     						for(User user: subscribers) {
-    							
+
     							long chat_id_notifica = telegramRegistry.getChatIdByEmail(user.getEmail());
-    							
-    							SendMessage message = new SendMessage() // Create a message object object
-    		    						.setChatId(chat_id_notifica)
-    		    						.setText("notifica-evento");
-    		    				execute(message); // Sending our message object to user
+
+    							if(chat_id_notifica != 0) {
+									SendMessage message = new SendMessage() // Create a message object object
+				    						.setChatId(chat_id_notifica)
+				    						.setText("notifica-evento");
+				    				execute(message); // Sending our message object to user
+    							}
     						}
     					}
     				}

@@ -1,10 +1,10 @@
-package main.java.server.backend;
+package server.backend;
 
 import java.util.TreeMap;
 
-import main.java.commons.exceptions.InvalidUserEmailException;
-import main.java.commons.exceptions.InvalidUserTokenException;
-import main.java.commons.User;
+import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.InvalidUserTokenException;
+import commons.User;
 
 public class TelegramUsersRegistry {
 	private TreeMap<Integer, User> token_map;

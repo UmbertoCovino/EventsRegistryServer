@@ -1,4 +1,4 @@
-package main.java.server.backend;
+package server.backend;
 
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -10,9 +10,9 @@ import java.util.Date;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import main.java.commons.Event;
-import main.java.commons.User;
-import main.java.commons.exceptions.InvalidUserEmailException;
+import commons.Event;
+import commons.User;
+import commons.exceptions.InvalidUserEmailException;
 /*
  * deep-linking telegram
  * https://telegram.me/EventsAppBot?/start=<token> the bot will receive a start string with payload (in our app the user's id)

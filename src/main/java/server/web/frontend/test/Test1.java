@@ -22,6 +22,7 @@ import commons.exceptions.InvalidEventIdException;
 import commons.exceptions.InvalidUserEmailException;
 
 
+@SuppressWarnings("unused")
 public class Test1 {
 	private final static String baseURI = "http://localhost:8182/eventsRegistry/";
 

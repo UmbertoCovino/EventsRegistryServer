@@ -233,7 +233,7 @@ public class UsersAccessObject {
 		return users;
 	}
 
-	public static String[] getUsersEmails() throws GenericSQLException {
+	public synchronized static String[] getUsersEmails() throws GenericSQLException {
 		ArrayList<String> emails = new ArrayList<>();
 		
 		try {

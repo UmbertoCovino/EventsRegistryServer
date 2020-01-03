@@ -285,7 +285,7 @@ public class EventsAccessObject {
 		return events;
 	}
 
-	public static ArrayList<Event> getEventsAfterDate(Date date) throws GenericSQLException, VoidClassFieldException {
+	public synchronized static ArrayList<Event> getEventsAfterDate(Date date) throws GenericSQLException, VoidClassFieldException {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		if (date == null)
@@ -326,7 +326,7 @@ public class EventsAccessObject {
 		return events;
 	}
 
-	public static ArrayList<Event> getEventsBeforeDate(Date date) throws GenericSQLException, VoidClassFieldException {
+	public synchronized static ArrayList<Event> getEventsBeforeDate(Date date) throws GenericSQLException, VoidClassFieldException {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		if (date == null)
@@ -367,7 +367,7 @@ public class EventsAccessObject {
 		return events;
 	}
 
-	public static ArrayList<Event> getEventsBetweenTwoDates(Date fromDate, Date toDate) throws GenericSQLException, VoidClassFieldException {
+	public synchronized static ArrayList<Event> getEventsBetweenTwoDates(Date fromDate, Date toDate) throws GenericSQLException, VoidClassFieldException {
 		ArrayList<Event> events = new ArrayList<>();
 		
 		if (fromDate == null)

@@ -19,6 +19,7 @@ import server.backend.EventsAccessObject;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
+@SuppressWarnings("unused")
 public class EventUserOwnerJSON extends ServerResource {
 	
 	@Get("json")

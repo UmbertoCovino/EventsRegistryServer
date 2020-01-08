@@ -82,6 +82,35 @@
           <mainClass>src.main.java.server.web.frontend.EventsRegistryWebApplication</mainClass>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>verify-style</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <logViolationsToConsole>true</logViolationsToConsole>
+          <consoleOutput>true</consoleOutput>
+          <failsOnError>false</failsOnError>
+          <checkstyleRules>
+            <module name="Checker">
+              <!-- Checks for Size Violations.                    -->
+              <!-- See http://checkstyle.sf.net/config_sizes.html -->
+              <module name="FileLength">
+                <property name="max" value="3500" />
+                <property name="fileExtensions" value="java"/>
+              </module>
+            </module>
+          </checkstyleRules>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

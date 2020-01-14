@@ -4,7 +4,9 @@ package server.backend;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -12,15 +14,16 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import commons.Event;
 import commons.User;
+import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidUserEmailException;
+import commons.exceptions.VoidClassFieldException;
 /*
  * deep-linking telegram
  * https://telegram.me/EventsAppBot?/start=<token> the bot will receive a start string with payload (in our app the user's id)
  */
 public class TelegramBot extends TelegramLongPollingBot {
 	
-	private TelegramUsersRegistry telegramRegistry = TelegramUsersRegistry.instance();
-
+	private TelegramUsersAccessObject telegramRegistry = TelegramUsersAccessObject.instance();
 	
     @Override
     public void onUpdateReceived(Update update) {
@@ -37,8 +40,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 User user = telegramRegistry.getUserByToken(token);
                 
                 try {
-    				telegramRegistry.addChatIdByEmail(user.getEmail(), chat_id);
-    			} catch (InvalidUserEmailException e1) {
+    				telegramRegistry.updateUserChatId(user.getEmail(), chat_id);
+    			} catch (InvalidUserEmailException | GenericSQLException | VoidClassFieldException e1) {
     				// TODO Auto-generated catch block
     				e1.printStackTrace();
     			}
@@ -78,28 +81,32 @@ public class TelegramBot extends TelegramLongPollingBot {
     		try {
     			while (!this.isInterrupted()) {
     				
-    				ArrayList<Event> events = EventsAccessObject.getEvents();
     				Date today = new Date();
+    				Calendar c = Calendar.getInstance(); 
+    				c.setTime(today); 
+    				c.add(Calendar.DATE, 1);
+    				Date tomorrow = c.getTime();
     				
+    				ArrayList<Event> events = EventsAccessObject.getEventsBetweenTwoDates(today, tomorrow);
+    				System.out.println("notification thread");
     				for(Event event: events) {
     					// notifica tutti gli utenti che sono interessati ad eventi che si terranno in giornata
-
-    					if((event.getStartDate().getTime() - today.getTime()) <= 86400000) {	// 1 day  
+    					System.out.println(event.getTitle());
+    					ArrayList<User> subscribers = EventsAccessObject.getEventSubscribers(event.getId());
     						
-    						ArrayList<User> subscribers = EventsAccessObject.getEventSubscribers(event.getId());
-    						
-    						for(User user: subscribers) {
+						for(User user: subscribers) {
 
-    							long chat_id_notifica = telegramRegistry.getChatIdByEmail(user.getEmail());
+							long chat_id_notifica = telegramRegistry.getUserChatId(user.getEmail());
 
-    							if(chat_id_notifica != 0) {
-									SendMessage message = new SendMessage() // Create a message object object
-				    						.setChatId(chat_id_notifica)
-				    						.setText("notifica-evento");
-				    				execute(message); // Sending our message object to user
-    							}
-    						}
-    					}
+							if(chat_id_notifica != 0) {
+								SendMessage message = new SendMessage() // Create a message object object
+			    						.setChatId(chat_id_notifica)
+			    						.setText("Hey, a breve avrà inizio l'evento " + event.getTitle() 
+			    						+ "\n" + "inizio: " + event.getFormattedStartDate() + "\n" 
+			    						+ "fine: " + event.getFormattedEndDate());
+			    				execute(message); // Sending our message object to user
+							}
+						}
     				}
     				
     				Thread.sleep((long)60000);

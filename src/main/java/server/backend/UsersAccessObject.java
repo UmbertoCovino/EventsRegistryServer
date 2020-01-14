@@ -252,8 +252,6 @@ public class UsersAccessObject {
 
 		return emails.toArray(new String[emails.size()]);
 	}
-
-	
 	
 	// ADDERS -----------------------------------------------------------------------------------------------
 
@@ -283,7 +281,8 @@ public class UsersAccessObject {
 												       + "'" + user.getSurname() + "', "
 													   + "'" + user.getEmail() + "', "
 													   + "'" + user.getPassword() + "', "
-													   + "'" + user.getPhotoPath() + "');");
+													   + "'" + user.getPhotoPath() + "', "
+													   + "'" + 0 + "');");
 			}
 		} catch (SQLException e) {
 			throw new GenericSQLException(e.getMessage());
@@ -330,7 +329,7 @@ public class UsersAccessObject {
 		else
 			throw new GenericSQLException("An error occurred while updating user to DB.");
 	}
-
+	
 	public synchronized static int updateUserName(String email, String name) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		int result = 0;
 		

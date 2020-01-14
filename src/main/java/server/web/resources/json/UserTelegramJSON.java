@@ -12,14 +12,14 @@ import commons.exceptions.InvalidUserEmailException;
 import commons.exceptions.InvalidUserTokenException;
 import commons.exceptions.VoidClassFieldException;
 import commons.User;
-import server.backend.TelegramUsersRegistry;
+import server.backend.TelegramUsersAccessObject;
 import server.backend.UsersAccessObject;
 
 public class UserTelegramJSON extends ServerResource {
 
 	@Get
     public String getTelegramUser() {
-		TelegramUsersRegistry telegram_registry = TelegramUsersRegistry.instance();
+		TelegramUsersAccessObject telegram_registry = TelegramUsersAccessObject.instance();
 		Integer token = telegram_registry.getNextAvailableToken();
 		Gson gson = new Gson();
 		

@@ -9,7 +9,8 @@ create table users (
 	surname varchar(80) not null,
 	email varchar(80) primary key,
 	password varchar(20) not null,
-	photo_path varchar(40) not null
+	photo_path varchar(40) not null,
+	chat_id bigint(20) unsigned 
 );
 
 create table events (

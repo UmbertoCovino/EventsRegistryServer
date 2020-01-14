@@ -101,7 +101,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 							if(chat_id_notifica != 0) {
 								SendMessage message = new SendMessage() // Create a message object object
 			    						.setChatId(chat_id_notifica)
-			    						.setText("notifica-evento");
+			    						.setText("Hey, a breve avrà inizio l'evento " + event.getTitle() 
+			    						+ "\n" + "inizio: " + event.getFormattedStartDate() + "\n" 
+			    						+ "fine: " + event.getFormattedEndDate());
 			    				execute(message); // Sending our message object to user
 							}
 						}

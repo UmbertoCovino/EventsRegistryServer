@@ -42,15 +42,11 @@ public class testUsers {
 	@BeforeEach
 	public void setUp() throws Exception {
 		DBManager.executeUpdate("delete from users;");
-		DBManager.executeUpdate("delete from events;");
-		DBManager.executeUpdate("delete from events_users_participations;");
 	}
 	
 	@AfterEach
 	public void tearDown() throws Exception {
 		DBManager.executeUpdate("delete from users;");
-		DBManager.executeUpdate("delete from events;");
-		DBManager.executeUpdate("delete from events_users_participations;");
 	}
 	
 	/* è corretto far restituire una lista utenti ad un utente loggato (?) */

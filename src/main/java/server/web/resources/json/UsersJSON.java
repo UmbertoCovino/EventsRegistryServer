@@ -90,7 +90,7 @@ public class UsersJSON extends ServerResource {
     
     @Put("json")
     public String updateUser(String payload) throws ParseException, InvalidUserEmailException {
-    		Gson gson = EventsRegistryWebApplication.GSON;
+    	Gson gson = EventsRegistryWebApplication.GSON;
 		
 		User user;
 		try {

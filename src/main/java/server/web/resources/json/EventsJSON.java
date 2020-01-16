@@ -49,6 +49,7 @@ public class EventsJSON extends ServerResource {
 		Event event;
 		try {
 			event = gson.fromJson(payload, Event.class);
+		
 		} catch (JsonSyntaxException e) {
 			Status status = new Status(ErrorCodes.JSON_PARSING);
 			setStatus(status);
@@ -60,7 +61,7 @@ public class EventsJSON extends ServerResource {
 			event.setOwnerEmail(getClientInfo().getUser().getIdentifier());
 			
 			int lastInsertedId = EventsAccessObject.addEvent(event);
-			
+
 			String photoPath = lastInsertedId + ".jpg";
 			
 			EventsAccessObject.updateEventPhotoPath(lastInsertedId, photoPath);
@@ -105,7 +106,7 @@ public class EventsJSON extends ServerResource {
 				throw new UnauthorizedUserException("You are not authorized.");
 			
 			EventsAccessObject.updateEvent(event);
-			
+
 			return gson.toJson(true, boolean.class);
 //			return gson.toJson("Event with id " + event.getId() + " updated.", String.class);
 		} catch (UnauthorizedUserException e) {
@@ -116,13 +117,18 @@ public class EventsJSON extends ServerResource {
 		} catch (VoidClassFieldException e) {
 			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
 			setStatus(status);
-			
+
 			return gson.toJson(e, VoidClassFieldException.class);
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);
 			
 			return gson.toJson(e, GenericSQLException.class);
+		} catch(InvalidEventIdException e) {
+			Status status = new Status(ErrorCodes.INVALID_EVENT_ID);
+			setStatus(status);
+			
+			return gson.toJson(e, InvalidEventIdException.class);
 		}
     }
     

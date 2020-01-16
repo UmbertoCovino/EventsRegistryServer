@@ -305,6 +305,8 @@ public class UsersAccessObject {
 			throw new VoidClassFieldException("The name passed cannot be null or empty.");
 		else if (user.getSurname() == null || user.getSurname().equals(""))
 			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
+		else if (user.getPassword() == null || user.getPassword().equals(""))
+			throw new VoidClassFieldException("The password passed cannot be null or empty.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + user.getEmail() + "';");

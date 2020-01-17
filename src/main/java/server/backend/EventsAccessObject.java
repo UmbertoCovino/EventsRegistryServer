@@ -499,7 +499,7 @@ public class EventsAccessObject {
 	
 	// UPDATERS --------------------------------------------------------------------------------------------
 	
-	public synchronized static int updateEvent(Event event) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+	public synchronized static int updateEvent(Event event) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException, InvalidUserEmailException {
 		int result = 0;
 		
 		if (event.getId() == null)
@@ -518,14 +518,27 @@ public class EventsAccessObject {
 				if (rs.getInt("events_number") == 0)
 					throw new InvalidEventIdException("Inexistent event id: " + event.getId());
 				
-				result = DBManager.executeUpdate("update events "
-											   + "set title = '" + event.getTitle() + "', "
-												   + "start_date = '" + event.getFormattedStartDate() + "', "
-												   + "end_date = '" + event.getFormattedEndDate() + "', "
-												   + "description = '" + event.getDescription() + "' "
-												   + ((event.getPhotoPath() != null) ? ", photo_path = '" + event.getPhotoPath() + "' " : "")
-												   + ((event.getOwnerEmail() != null) ? ", user_owner_email = '" + event.getOwnerEmail() + "' " : "")
-											   + "where id = '" + event.getId() + "';");
+				String query = "update events "
+						   	 + "set title = '" + event.getTitle() + "', "
+						     + "start_date = '" + event.getFormattedStartDate() + "', "
+						     + "end_date = '" + event.getFormattedEndDate() + "', "
+						     + "description = '" + event.getDescription() + "' "
+						     + ((event.getPhotoPath() != null) ? ", photo_path = '" + event.getPhotoPath() + "' " : "")
+						     + ((event.getOwnerEmail() != null) ? ", user_owner_email = '" + event.getOwnerEmail() + "' " : "")
+					         + "where id = '" + event.getId() + "';";
+				
+				if (event.getOwnerEmail() != null) {
+					rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + event.getOwnerEmail() + "';");
+					
+					if (rs.next()) {
+						if (rs.getInt("users_number") == 0)
+							throw new InvalidUserEmailException("Inexistent user email: " + event.getOwnerEmail());
+						
+							result = DBManager.executeUpdate(query);
+					} else {
+						result = DBManager.executeUpdate(query);
+					}
+				}
 			}
 		} catch (SQLException e) {
 			throw new GenericSQLException(e.getMessage());
@@ -672,7 +685,7 @@ public class EventsAccessObject {
 			throw new GenericSQLException("An error occurred while updating event in DB.");
 	}
 	
-	public synchronized static int updateEventOwnerEmail(int id, String ownerEmail) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+	public synchronized static int updateEventOwnerEmail(int id, String ownerEmail) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException, InvalidUserEmailException {
 		int result = 0;
 		
 		if (ownerEmail == null || ownerEmail.equals(""))
@@ -685,9 +698,16 @@ public class EventsAccessObject {
 				if (rs.getInt("events_number") == 0)
 					throw new InvalidEventIdException("Inexistent event id: " + id);
 				
-				result = DBManager.executeUpdate("update events "
-											   + "set user_owner_email = '" + ownerEmail + "' "
-											   + "where id = '" + id + "';");
+				rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + ownerEmail + "';");
+				
+				if (rs.next()) {
+					if (rs.getInt("users_number") == 0)
+						throw new InvalidUserEmailException("Inexistent user email: " + ownerEmail);
+				
+					result = DBManager.executeUpdate("update events "
+												   + "set user_owner_email = '" + ownerEmail + "' "
+												   + "where id = '" + id + "';");
+				}
 			}
 		} catch (SQLException e) {
 			throw new GenericSQLException(e.getMessage());

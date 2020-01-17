@@ -129,7 +129,12 @@ public class EventsJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, InvalidEventIdException.class);
-		}
+		} catch (InvalidUserEmailException e) {
+			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);
+			setStatus(status);
+			
+			return gson.toJson(e, InvalidUserEmailException.class);
+		} 
     }
     
 //    @Delete("json")

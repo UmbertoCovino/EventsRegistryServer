@@ -1,0 +1,304 @@
+CATEGORY PARTITION
+
+GET .../UsersJSON
+Environment caratteristiche:
+	- numero utenti presenti nel DB
+		- empty set	 
+		- = 1
+		- n > 0
+
+POST .../UsersJSON
+parametro USER:
+	- lunghezza name
+		- >0 	[property surname_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- lunghezza surname
+		- >0 	[property surnname_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- lunghezza password
+		- >6 	[property password_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[property valid_email]
+		- patter !equals username@dominio	[error]
+
+Environment caratteristiche:
+	- Stato registrazione:
+		- Utente registrato, già presente [error]
+		- Utente non già registrato [if property name_OK && surname_OK && email_OK && password_OK && valid_email]
+
+PUT .../UsersJSON
+Environment caratteristiche:
+	- Stato autenticazione:
+		- utente loggato		[property logged]
+		- utente non logged 		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	[if logged] [property authorized]
+		- email_logged_user !equals USER_email_passed	[error]
+
+parametro USER:
+	- lunghezza name
+		- >0 	[if authorized] [property surname_OK] 
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- lunghezza surname
+		- >0 	[if authorized] [property surnname_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- lunghezza email
+		- >0 	[if authorized] [property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[if authorized][property valid_email]
+		- patter !equals username@dominio	[error]
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+GET .../UserJSON{email}
+parametro email:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[property valid_email]
+		- patter !equals username@dominio	[error]
+Environment caratteristiche:
+	- Validità utente
+		- Utente presente nel DB	[property valid_user]
+		- Utente non presente nel DB 	[error]
+
+DELETE .../UserJSON{email}
+parametro USER:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[if email_OK] [property valid_email]
+		- patter !equals username@dominio	[error]
+Environment caratteristiche:
+	- Stato autenticazione:
+		- utente loggato		[property logged]
+		- utente non logged 		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	[if logged && valid_email && email_OK] [property authorized]
+		- email_logged_user !equals USER_email_passed	[error]
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+GET .../UserPhotoJSON
+parametro email:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[property valid_email]
+		- patter !equals username@dominio	[error]
+Environment caratteristiche:
+	- Validità utente
+		- Utente presente nel DB	[property valid_user]
+		- Utente non presente nel DB 	[error]
+
+PUT .../UserPhotoJSON
+parametro email:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[property valid_email]
+		- patter !equals username@dominio	[error]
+parametro entity_photo:
+	- MediaType
+		- MediaType.JPG	[if authorized] [MediaType_OK]
+		- !MediaType.JPG	[error] 
+Environment caratteristiche:
+	- Stato autenticazione:
+		- utente loggato		[if email_OK] [property logged]
+		- utente non logged 		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	[if logged && valid_email && email_OK] [property authorized]
+		- email_logged_user !equals USER_email_passed	[error]
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+GET .../EventsJSON
+Environment caratteristiche:
+	- numero eventi presenti nel DB
+		- empty set	 
+		- = 1
+		- n > 0
+
+POST .../EventsJSON
+Environment caratteristiche:
+	- Stato autenticazione:
+		- utente loggato		[property logged]
+		- utente non logged 		[error]
+parametro EVENTO:
+	- lunghezza titolo
+		- >0 	[property surname_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione startDate
+		- equals to pattern yyyy-MM-dd HH:mm:ss [propery well_formatted_start]
+		- !equals to pattern yyyy-MM-dd HH:mm:ss	[error]
+	- formattazione endDate
+		- equals to pattern yyyy-MM-dd HH:mm:ss [propery well_formatted_end]
+		- !equals to pattern yyyy-MM-dd HH:mm:ss	[error]
+	- logica temporale
+		- startDate after or equals now() 	[property start_after_now_OK]
+		- endDate isBefore startDate 	[error]
+		- endDate isAfter startDate	[property end_after_start_OK]
+	- lunghezza descrizione
+		- >0 	[property surnname_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+
+PUT .../EventsJSON
+Environment caratteristiche:
+	- Stato autenticazione:
+		- utente loggato		[property logged]
+		- utente non logged 		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	[if logged] [property authorized]
+		- email_logged_user !equals USER_email_passed	[error]
+	- Presenza evento 
+		- event with id in db	[error]
+		- event with id !in db	[if id_OK && ...] [property event_present]
+parametro EVENTO:
+	- valore id
+		- >0 	[property id_OK]
+		- <= 0 [error]
+	- lunghezza titolo
+		- >0 	[property titolo_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione startDate
+		- equals to pattern yyyy-MM-dd HH:mm:ss	[well_formatted_start]
+		- !equals to pattern yyyy-MM-dd HH:mm:ss	[error]
+	- formattazione endDate	
+		- equals to pattern yyyy-MM-dd HH:mm:ss	[well_formatted_end]
+		- !equals to pattern yyyy-MM-dd HH:mm:ss	[error]
+	- logica temporale
+		- startDate after or equals now() 	[property start_after_now_OK]
+		- endDate isBefore startDate 	[error]
+		- endDate isAfter startDate	[property end_after_start_OK]
+	- lunghezza descrizione
+		- >0 	[property descrizione_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+
+------------------------------------------------------------------------------------------------------------
+
+GET .../EventsAfterDateJSON
+parametro DATE:
+	- formattazione date
+		- equals to pattern yyyy-MM-dd HH:mm:ss	[well_formatted]
+		- !equals to pattern yyyy-MM-dd HH:mm:ss	[error]
+	- range 
+		- date is before lowLimit() [error]
+		- date is after lowLimit() 	[after_lowLimit_OK]
+Environment caratteristiche:
+	- numero eventi presenti nel DB after date
+		- empty set	 
+		- = 1
+		- n > 0
+
+-----------------------------------------------------------------------------------------------------------
+
+
+GET .../EventsBeforeDateJSON
+parametro DATE:
+	- formattazione date
+		- equals to pattern yyyy-MM-dd HH:mm:ss	[well_formatted]
+		- !equals to pattern yyyy-MM-dd HH:mm:ss	[error]
+	- range 
+		- date is before lowLimit() [error]
+		- date is after lowLimit() 	[after_lowLimit_OK]
+Environment caratteristiche:
+	- numero eventi presenti nel DB before date
+		- empty set	 
+		- = 1
+		- n > 0
+
+--------------------------------------------------------------------------------------------------------------
+
+GET .../EventsFromDateToDateJSON{from}{to}
+parametro FROM:
+	- formattazione date
+		- equals to pattern yyyy-MM-dd HH:mm:ss	[property well_formatted]
+		- !equals to pattern yyyy-MM-dd HH:mm:ss	[error]
+	- range 
+		- date is before lowLimit() [error]
+		- date is after or equals to lowLimit()		[property from_lowLimit_OK]
+parametro TO:
+	- formattazione date
+		- equals to pattern yyyy-MM-dd HH:mm:ss	[well_formatted]
+		- !equals to pattern yyyy-MM-dd HH:mm:ss	[error]
+	- range 
+		- date is before lowLimit() [error]
+		- date is after or equals to lowLimit() 	[property to_lowLimit_OK]
+	- logica temporale
+		- to is after or equals to from 	[temporal_logic_OK]
+		- to is before from 	[error]
+Environment caratteristiche:
+	- numero eventi presenti nel DB between from and to
+		- empty set	 
+		- = 1
+		- n > 0
+
+------------------------------------------------------------------------------------------------------------
+
+GET .../EventPhotoJSON
+parametro email:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[property valid_email]
+		- patter !equals username@dominio	[error]
+Environment caratteristiche:
+	- Validità utente
+		- Utente presente nel DB	[property valid_user]
+		- Utente non presente nel DB 	[error]
+
+PUT .../EventPhotoJSON
+parametro id:
+	- valore id
+		- >0 	[property id_OK]
+		- <= 0 [error]
+parametro entity_photo:
+	- MediaType
+		- MediaType.JPG	[if authorized] [MediaType_OK]
+		- !MediaType.JPG	[error] 
+Environment caratteristiche:
+	- Stato autenticazione:
+		- utente loggato		[if email_OK] [property logged]
+		- utente non logged 		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	[if logged && valid_email && email_OK] [property authorized]
+		- email_logged_user !equals USER_email_passed	[error]
+	- Presenza evento 
+		- event with id in db	[error]
+		- event with id !in db	[if id_OK && ...] [property event_present]
+
+
+
+
+
+
+
+
+
+

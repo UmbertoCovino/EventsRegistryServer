@@ -86,11 +86,12 @@ class UserJSONTest {
 	
 	///////////////////////////////////////////POST//////////////////////////////////////////////////////
 	
-	// non mi è chiara la funzione del POST nella resource class UserJson
+	// non mi è chiara la funzione del POST nella resource class UserJson 
+	// va rivisto questo metodo: getIfPasswordIsCorrect, eventualmente potrebbe essere usata la guard ed evitare la verifica
 	
 	//////////////////////////////////////////DELETE////////////////////////////////////////////////////
 	
-	// (?) ma non ci vuole una guard per eliminare un utente? test dopo aver verificato questa cosa.
+	// da fare
 	
 	
 }

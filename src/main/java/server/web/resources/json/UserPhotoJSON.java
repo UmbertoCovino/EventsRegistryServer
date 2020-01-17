@@ -73,7 +73,7 @@ public class UserPhotoJSON extends ServerResource {
 			if (!getClientInfo().getUser().getIdentifier().equals(email))
 				throw new UnauthorizedUserException("You are not authorized.");
 
-			String photoPath = UsersAccessObject.getUserPhotoPath(getAttribute("email"));
+			String photoPath = UsersAccessObject.getUserPhotoPath(email);
 			
 			try {
 				entity.write(new FileOutputStream(new File(EventsRegistryWebApplication.USERS_PHOTOS_DIRECTORY + photoPath)));

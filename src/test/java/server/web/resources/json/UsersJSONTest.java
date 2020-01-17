@@ -1,4 +1,4 @@
-package webResources;
+package server.web.resources.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -239,6 +239,7 @@ public class UsersJSONTest {
 		
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
 				"email_test", "password_test");
+		
 		request = new Request(Method.PUT, url);
 		request.setChallengeResponse(challengeResponse);		
 		user = new User("name_test_UPDATE", "surname_test_UPDATE", "", "password_test", null);
@@ -246,6 +247,29 @@ public class UsersJSONTest {
 		Response jsonResponse = client.handle(request);
 		
 		assertEquals(901, jsonResponse.getStatus().getCode());
+	}
+	
+	@Test
+	/* update user -> empty space for email parameter, user param email changed ---> UNAUTHORIZED_USER = 901*/
+	public void testPut7() {
+		String url = "http://localhost:8182/eventsRegistry/users";
+		Client client = new Client(Protocol.HTTP);
+		
+		Request request = new Request(Method.POST, url);
+		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+		
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
+				"email_test", "password_test_WRONG");
+		
+		request = new Request(Method.PUT, url);
+		request.setChallengeResponse(challengeResponse);		
+		user = new User("name_test_UPDATE", "surname_test_UPDATE", "", "password_test", null);
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		Response jsonResponse = client.handle(request);
+		
+		assertEquals(401, jsonResponse.getStatus().getCode());
 	}
 
 }

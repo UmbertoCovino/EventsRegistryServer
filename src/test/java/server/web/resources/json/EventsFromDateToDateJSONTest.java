@@ -1,4 +1,4 @@
-package webResources;
+package server.web.resources.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,7 +16,7 @@ import org.restlet.data.Protocol;
 import server.backend.DBManager;
 import server.web.frontend.EventsRegistryWebApplication;
 
-class EventsBeforeDateJSONTest {
+class EventsFromDateToDateJSONTest {
 
 	private String url = "http://localhost:8182/eventsRegistry/events";
 	private Client client = new Client(Protocol.HTTP);
@@ -44,7 +44,9 @@ class EventsBeforeDateJSONTest {
 	/* all parameter are valid ---> 200 OK */
 	public void testGet1() {
 		// dovrei aggiungere un evento dopo e verificare che il GET abbia restituito quello
-		Request request = new Request(Method.GET, url+"/before/"+"2020-01-10 10:00:00");
+		String from = "2020-01-10 10:00:00";
+		String to = "2020-01-12 10:00:00";
+		Request request = new Request(Method.GET, url + "/between/" + from + "/" + to);
 		Response jsonResponse = client.handle(request);
 
 		assertEquals(200, jsonResponse.getStatus().getCode());
@@ -54,10 +56,16 @@ class EventsBeforeDateJSONTest {
 	/* invalid format for date attribute ---> DATE_PARSING = 953 */
 	public void testGet2() {
 		// dovrei aggiungere un evento dopo e verificare che il GET abbia restituito quello
-		Request request = new Request(Method.GET, url+"/before/"+"2020.01.10 10:00:00");
-		Response jsonResponse = client.handle(request);
+		String from = "2020.01.10 10:00:00";
+		String to = "2020.01.12 10:00:00";
+		Request request = new Request(Method.GET, url + "/between/" + from + "/" + to);
+		Response jsonResponse = client.handle(request);;
 
 		assertEquals(953, jsonResponse.getStatus().getCode());
 	}
+	
+	/* ci sono nel programma controlli per verificare la compatibilità logica tra le due date? 
+	 * Esempio se metto come from una data successiva a to, che succede? 
+	 * ci deve essere? */
 
 }

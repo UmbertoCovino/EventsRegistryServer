@@ -1,4 +1,4 @@
-package webResources;
+package server.web.resources.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 

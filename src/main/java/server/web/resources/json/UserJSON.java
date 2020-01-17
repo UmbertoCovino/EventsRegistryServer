@@ -31,7 +31,7 @@ public class UserJSON extends ServerResource {
 		
 		try {
 			User user = UsersAccessObject.getUser(getAttribute("email"));
-		
+			
 			return gson.toJson(user, User.class);
 		} catch (InvalidUserEmailException e) {
 			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);

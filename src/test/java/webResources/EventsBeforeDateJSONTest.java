@@ -16,7 +16,7 @@ import org.restlet.data.Protocol;
 import server.backend.DBManager;
 import server.web.frontend.EventsRegistryWebApplication;
 
-class testEventsBeforeDate {
+class EventsBeforeDateJSONTest {
 
 	private String url = "http://localhost:8182/eventsRegistry/events";
 	private Client client = new Client(Protocol.HTTP);

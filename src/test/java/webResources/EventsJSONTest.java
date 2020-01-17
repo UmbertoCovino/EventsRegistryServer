@@ -33,7 +33,7 @@ import commons.User;
 import server.backend.DBManager;
 import server.web.frontend.EventsRegistryWebApplication;
 
-class testEvents {
+class EventsJSONTest {
 
 	private static Gson gson;
 	private String url = "http://localhost:8182/eventsRegistry/events";

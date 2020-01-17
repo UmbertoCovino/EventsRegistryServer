@@ -26,7 +26,7 @@ import commons.User;
 import server.backend.DBManager;
 import server.web.frontend.EventsRegistryWebApplication;
 
-public class testUsers {
+public class UsersJSONTest {
 
 	private static Gson gson = new Gson();
 	

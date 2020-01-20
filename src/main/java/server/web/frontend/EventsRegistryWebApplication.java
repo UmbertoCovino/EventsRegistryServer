@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.BindException;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -273,6 +274,8 @@ public class EventsRegistryWebApplication extends Application {
 		      	        
 		    // Start the component
 		    component.start();
+		} catch(BindException e) {
+			System.err.print(e.getLocalizedMessage());
 		} catch (Exception e) {	// Something is wrong
 			e.printStackTrace();
 		}

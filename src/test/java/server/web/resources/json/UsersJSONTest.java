@@ -1,17 +1,12 @@
 package server.web.resources.json;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.restlet.Client;
-import org.restlet.Component;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeResponse;
@@ -67,7 +62,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 
-		assertEquals(true, gson.fromJson(jsonResponse.getEntityAsText(), boolean.class));
+		Assertions.assertEquals(true, gson.fromJson(jsonResponse.getEntityAsText(), boolean.class));
 	}
 	
 	@Test
@@ -82,7 +77,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse2 = client.handle(request);
 		
-		assertEquals(900, jsonResponse2.getStatus().getCode());
+		Assertions.assertEquals(900, jsonResponse2.getStatus().getCode());
 	}
 	
 	@Test
@@ -95,7 +90,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(950, jsonResponse.getStatus().getCode());
+		Assertions.assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 	
 	@Test
@@ -108,7 +103,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(950, jsonResponse.getStatus().getCode());
+		Assertions.assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 	
 	@Test
@@ -121,7 +116,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(950, jsonResponse.getStatus().getCode());
+		Assertions.assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 	
 	@Test
@@ -134,7 +129,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(950, jsonResponse.getStatus().getCode());
+		Assertions.assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 	
 	@Test
@@ -155,7 +150,7 @@ public class UsersJSONTest {
 		request.setChallengeResponse(challengeResponse);
 		Response jsonResponse = client.handle(request);
 
-		assertEquals(true, gson.fromJson(jsonResponse.getEntityAsText(), boolean.class));
+		Assertions.assertEquals(true, gson.fromJson(jsonResponse.getEntityAsText(), boolean.class));
 	}
 	
 	@Test
@@ -178,7 +173,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(950, jsonResponse.getStatus().getCode());
+		Assertions.assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 	
 	@Test
@@ -200,7 +195,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(950, jsonResponse.getStatus().getCode());
+		Assertions.assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 	
 	@Test
@@ -223,7 +218,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(950, jsonResponse.getStatus().getCode());
+		Assertions.assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 		
 	@Test
@@ -246,7 +241,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(901, jsonResponse.getStatus().getCode());
+		Assertions.assertEquals(901, jsonResponse.getStatus().getCode());
 	}
 	
 	@Test
@@ -269,7 +264,7 @@ public class UsersJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals(401, jsonResponse.getStatus().getCode());
+	    Assertions.assertEquals(401, jsonResponse.getStatus().getCode());
 	}
 
 }

@@ -8,7 +8,6 @@ class UserPhotoJSONTest {
 
 	@Test
 	void test() {
-		fail("Not yet implemented");
 	}
 
 }

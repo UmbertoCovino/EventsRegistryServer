@@ -1,7 +1,7 @@
 CATEGORY PARTITION
 
 GET .../UsersJSON
-Environment caratteristiche:
+Environment properties:
 	- numero utenti presenti nel DB
 		- empty set	 
 		- = 1
@@ -35,7 +35,7 @@ Environment caratteristiche:
 		- Utente non già registrato [if property name_OK && surname_OK && email_OK && password_OK && valid_email]
 
 PUT .../UsersJSON
-Environment caratteristiche:
+Environment properties:
 	- Stato autenticazione:
 		- utente loggato		[property logged]
 		- utente non logged 		[error]
@@ -85,7 +85,7 @@ parametro USER:
 	- formattazione email
 		- pattern equals username@dominio	[if email_OK] [property valid_email]
 		- patter !equals username@dominio	[error]
-Environment caratteristiche:
+Environment properties:
 	- Stato autenticazione:
 		- utente loggato		[property logged]
 		- utente non logged 		[error]
@@ -122,7 +122,7 @@ parametro entity_photo:
 	- MediaType
 		- MediaType.JPG	[if authorized] [MediaType_OK]
 		- !MediaType.JPG	[error] 
-Environment caratteristiche:
+Environment properties:
 	- Stato autenticazione:
 		- utente loggato		[if email_OK] [property logged]
 		- utente non logged 		[error]
@@ -165,7 +165,7 @@ parametro EVENTO:
 		- >#sql_limit_value [error]
 
 PUT .../EventsJSON
-Environment caratteristiche:
+Environment properties:
 	- Stato autenticazione:
 		- utente loggato		[property logged]
 		- utente non logged 		[error]
@@ -208,7 +208,7 @@ parametro DATE:
 	- range 
 		- date is before lowLimit() [error]
 		- date is after lowLimit() 	[after_lowLimit_OK]
-Environment caratteristiche:
+Environment properties:
 	- numero eventi presenti nel DB after date
 		- empty set	 
 		- = 1
@@ -225,7 +225,7 @@ parametro DATE:
 	- range 
 		- date is before lowLimit() [error]
 		- date is after lowLimit() 	[after_lowLimit_OK]
-Environment caratteristiche:
+Environment properties:
 	- numero eventi presenti nel DB before date
 		- empty set	 
 		- = 1
@@ -251,7 +251,7 @@ parametro TO:
 	- logica temporale
 		- to is after or equals to from 	[temporal_logic_OK]
 		- to is before from 	[error]
-Environment caratteristiche:
+Environment properties:
 	- numero eventi presenti nel DB between from and to
 		- empty set	 
 		- = 1
@@ -268,7 +268,7 @@ parametro email:
 	- formattazione email
 		- pattern equals username@dominio	[property valid_email]
 		- patter !equals username@dominio	[error]
-Environment caratteristiche:
+Environment properties:
 	- Validità utente
 		- Utente presente nel DB	[property valid_user]
 		- Utente non presente nel DB 	[error]
@@ -282,7 +282,7 @@ parametro entity_photo:
 	- MediaType
 		- MediaType.JPG	[if authorized] [MediaType_OK]
 		- !MediaType.JPG	[error] 
-Environment caratteristiche:
+Environment properties:
 	- Stato autenticazione:
 		- utente loggato		[if email_OK] [property logged]
 		- utente non logged 		[error]
@@ -294,6 +294,23 @@ Environment caratteristiche:
 		- event with id !in db	[if id_OK && ...] [property event_present]
 
 
+-----------------------------------------------------------------------------------------------------------------------------------
+GET .../UserTelegramJSON {email}
+parametro email:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[property valid_email]
+		- patter !equals username@dominio	[error]
+Environment properties:
+	- Stato autenticazione:
+		- utente loggato		[property logged]
+		- utente non logged 		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	[if logged] [property authorized]
+		- email_logged_user !equals USER_email_passed	[error]
 
 
 

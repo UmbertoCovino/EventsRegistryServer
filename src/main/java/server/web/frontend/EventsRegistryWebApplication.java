@@ -156,7 +156,7 @@ public class EventsRegistryWebApplication extends Application {
 		router.attach("/eventsRegistry/users/{email}/password", getGuard(UserPasswordJSON.class));					// not used
 		router.attach("/eventsRegistry/users/{email}/photo", getGuardExcludingGet(UserPhotoJSON.class));
 		router.attach("/eventsRegistry/users/{email}/events", getGuard(UserEventsJSON.class));						// not used
-		router.attach("/eventsRegistry/users/{email}/telegram", UserTelegramJSON.class);
+		router.attach("/eventsRegistry/users/{email}/telegram", getGuard(UserTelegramJSON.class));
 		
 //		try {
 //			urapi.remove("ciao@er.it");

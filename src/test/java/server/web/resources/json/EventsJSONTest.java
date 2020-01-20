@@ -42,9 +42,7 @@ class EventsJSONTest {
 	@BeforeAll
 	public static void setUpBeforeAll() throws Exception {				
 		EventsRegistryWebApplication.main(null);
-		gson = new GsonBuilder()
-				.registerTypeAdapter(Date.class, new DateTypeAdapter())
-				.create();
+		gson = EventsRegistryWebApplication.GSON;
 
 		DBManager.executeUpdate("delete from users;");
 		
@@ -217,7 +215,7 @@ class EventsJSONTest {
 		request.setChallengeResponse(challengeResponse);
 		Event event_update = events[0];
 		event_update.setTitle("title_text_UPDATED");
-		event_update.setId(-1);
+		event_update.setId(-1);						// the db doesn't contain this id 	
 		request.setEntity(gson.toJson(event_update, Event.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
@@ -225,8 +223,7 @@ class EventsJSONTest {
 	}
 	
 	@Test
-	/* update event: UNAUTHORIZED_USER = 901 --- NON DOVREBBE ESSERE MODIFICATO IL challengeResponse (?) rivedere 
-	 * implementazione */
+	/* update event: UNAUTHORIZED_USER = 901 */
 	public void testPut3() throws ParseException {
 		Request request;
 						
@@ -248,33 +245,11 @@ class EventsJSONTest {
 		request.setChallengeResponse(challengeResponse);
 		Event event_update = events[0];
 		event_update.setOwnerEmail("email_test_invalid");
+		
 		event_update.setTitle("title_text_UPDATED");
 		request.setEntity(gson.toJson(event_update, Event.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
 		assertEquals(901, jsonResponse.getStatus().getCode());
 	}
-	
-	//--------------------------------------UTILITY------------------------------------------------
-	
-	static class DateTypeAdapter extends TypeAdapter<Date> {
-
-		@Override
-		public void write(JsonWriter out, Date value) throws IOException {
-			if (value != null)
-				out.value(Event.DATETIME_SDF.format(value));
-			else
-				out.nullValue();
-		}
-
-		@Override
-		public Date read(JsonReader in) throws IOException {
-			try {
-				return Event.DATETIME_SDF.parse(in.nextString());
-			} catch (ParseException e) {
-				throw new IOException("Invalid format for datetime: correct one is 'yyyy-MM-dd HH:mm:ss'.");
-			}
-		}
-	}
-
 }

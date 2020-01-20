@@ -105,6 +105,7 @@ public class EventsJSON extends ServerResource {
 			if (!getClientInfo().getUser().getIdentifier().equals(event.getOwnerEmail()))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
+			// mi serve un evento con l'id esatto!!!
 			EventsAccessObject.updateEvent(event);
 
 			return gson.toJson(true, boolean.class);

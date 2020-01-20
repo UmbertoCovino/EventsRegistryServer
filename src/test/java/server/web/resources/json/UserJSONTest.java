@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.data.ChallengeResponse;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
@@ -91,7 +93,24 @@ class UserJSONTest {
 	
 	//////////////////////////////////////////DELETE////////////////////////////////////////////////////
 	
-	// da fare
-	
+	@Test
+	/* authorized user (email_logged_user equals USER_email_passed) ---> 200 OK */
+	public void delete1() {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		Client client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+		
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
+				"email_test", "password_test");
+		
+		request = new Request(Method.DELETE, url + "email_test");
+		request.setChallengeResponse(challengeResponse);
+		Response jsonResponse = client.handle(request);
+		
+		assertEquals("User with email " + "email_test" + " removed.", gson.fromJson(jsonResponse.getEntityAsText(), String.class));
+	}
 	
 }

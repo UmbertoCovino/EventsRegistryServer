@@ -104,10 +104,16 @@ parametro email:
 	- formattazione email
 		- pattern equals username@dominio	[property valid_email]
 		- patter !equals username@dominio	[error]
-Environment caratteristiche:
-	- Validità utente
-		- Utente presente nel DB	[property valid_user]
-		- Utente non presente nel DB 	[error]
+Environment caratteristiche: (per quanto riguarda Stato autenticazione e stato autorizzazione bisogna modificare la Guard nel codice)
+	- Stato autenticazione:
+		- utente loggato		[if email_OK] [property logged]
+		- utente non logged 		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	[if logged && valid_email && email_OK] [property authorized]
+		- email_logged_user !equals USER_email_passed	[error]
+	- Presenza foto
+		- foto presente nel DB
+		- foto non presente nel DB
 
 PUT .../UserPhotoJSON
 parametro email:
@@ -311,6 +317,85 @@ Environment properties:
 	- Stato autorizzazione:
 		- email_logged_user equals USER_email_passed	[if logged] [property authorized]
 		- email_logged_user !equals USER_email_passed	[error]
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+GET .../EventSubscribersJSON {id} (event)
+parametro email:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[property valid_email]
+		- patter !equals username@dominio	[error]
+	-parametro id:
+		- valore id
+			- >0 	[property id_OK]
+			- <= 0 [error]
+Environment properties:
+	- Presenza evento 
+		- event with {id} present in db	
+		- event with {id} not present in db	
+	- Numero subscribers all'evento
+		- num(subscribers) = 0;
+		- num(subscribers) = 1;
+		- num(subscribers) > 1;
+
+POST .../EventSubscribersJSON {id} (event)
+parametro email:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[property valid_email]
+		- patter !equals username@dominio	[error]
+	-parametro id:
+		- valore id
+			- >0 	[property id_OK]
+			- <= 0 [error]
+Environment properties:
+	- Presenza evento 
+		- event with {id} present in db	
+		- event with {id} not present in db	[error]
+	- Stato autenticazione:
+		- utente loggato		
+		- utente non logged 		[error]
+	- Stato sottoscrizione
+		- utente not subscribered yet	
+		- utente subscribered		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	
+		- email_logged_user !equals USER_email_passed	[error]	
+
+DELETE .../EventSubscribersJSON {id} (event)
+parametro USER:
+	- lunghezza email
+		- >0 	[property email_OK]
+		- <=0 	[error]
+		- >#sql_limit_value [error]
+	- formattazione email
+		- pattern equals username@dominio	[if email_OK] [property valid_email]
+		- patter !equals username@dominio	[error]
+	- parametro id:
+		- valore id
+			- >0 	[property id_OK]
+			- <= 0 [error]
+Environment properties:
+	- Presenza evento 
+		- event with {id} present in db	
+		- event with {id} not present in db	[error]
+	- Stato sottoscrizione
+		- utente not subscribered yet	[error]
+		- utente subscribered
+	- Stato autenticazione:
+		- utente loggato		[property logged]
+		- utente non logged 		[error]
+	- Stato autorizzazione:
+		- email_logged_user equals USER_email_passed	[if logged && valid_email && email_OK] [property authorized]
+		- email_logged_user !equals USER_email_passed	[error]
+	
 
 
 

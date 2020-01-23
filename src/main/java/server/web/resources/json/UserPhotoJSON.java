@@ -66,15 +66,14 @@ public class UserPhotoJSON extends ServerResource {
     
     @Put("jpeg")
     public String updatePhoto(Representation entity) throws ResourceException {
-    		Gson gson = EventsRegistryWebApplication.GSON;
+    	Gson gson = EventsRegistryWebApplication.GSON;
 		String email = getAttribute("email");
-		
+
 		try {
 			if (!getClientInfo().getUser().getIdentifier().equals(email))
 				throw new UnauthorizedUserException("You are not authorized.");
 
 			String photoPath = UsersAccessObject.getUserPhotoPath(email);
-			
 			try {
 				entity.write(new FileOutputStream(new File(EventsRegistryWebApplication.USERS_PHOTOS_DIRECTORY + photoPath)));
 			} catch (Exception e) {

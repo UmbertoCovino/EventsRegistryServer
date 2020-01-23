@@ -52,6 +52,7 @@ public class EventSubscribersJSON extends ServerResource {
 		
 		String email = gson.fromJson(payload, String.class);
 		try {
+
 			if (!getClientInfo().getUser().getIdentifier().equals(email))
 				throw new UnauthorizedUserException("You are not authorized.");
 			
@@ -91,7 +92,7 @@ public class EventSubscribersJSON extends ServerResource {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));
 		
-		String email = getAttribute("email");
+		String email = gson.fromJson(payload, String.class);
 		
 		try {
 			if (email == null)

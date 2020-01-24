@@ -1,8 +1,8 @@
-drop database events_registry;
+drop database if exists events_registry;
 
 create database events_registry;
 
-use events_registry
+use events_registry;
 
 create table users (
 	name varchar(80) not null,

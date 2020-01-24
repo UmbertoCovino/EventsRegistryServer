@@ -40,7 +40,12 @@ public class EventSubscribersJSON extends ServerResource {
 			setStatus(status);
 			
 			return gson.toJson(e, GenericSQLException.class);
-		}
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
+		} 
 		
 		return gson.toJson(subscribers.toArray(new User[subscribers.size()]), User[].class);
 	}

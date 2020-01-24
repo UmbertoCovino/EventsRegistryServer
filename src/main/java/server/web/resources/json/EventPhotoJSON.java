@@ -20,6 +20,7 @@ import commons.exceptions.ErrorCodes;
 import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidEventIdException;
 import commons.exceptions.UnauthorizedUserException;
+import commons.exceptions.VoidClassFieldException;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
@@ -58,7 +59,13 @@ public class EventPhotoJSON extends ServerResource {
 			
 //			return gson.toJson(e, GenericSQLException.class);
 			return null;
-		}
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+//			return gson.toJson(e, VoidClassFieldException.class);
+			return null;
+		} 
     }
     
     @Put("jpeg")
@@ -100,8 +107,12 @@ public class EventPhotoJSON extends ServerResource {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);
 			
-//			return gson.toJson(e, GenericSQLException.class);
-			return null;
-		}
+			return gson.toJson(e, GenericSQLException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+			
+			return gson.toJson(e, VoidClassFieldException.class);
+		} 
 	}
 }

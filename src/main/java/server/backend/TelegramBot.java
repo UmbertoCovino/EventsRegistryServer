@@ -33,7 +33,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         	String message_text = update.getMessage().getText();
             long chat_id = update.getMessage().getChatId();
             
-            if(message_text.contains("start")) {
+            if(message_text.startsWith("start")) {
             	
                 String tokenS = message_text.substring(7);
                 Integer token = Integer.parseInt(tokenS);

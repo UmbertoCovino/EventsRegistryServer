@@ -322,13 +322,6 @@ Environment properties:
 -------------------------------------------------------------------------------------------------------------------------------------
 GET .../EventSubscribersJSON {id} (event)
 parametro email:
-	- lunghezza email
-		- >0 	[property email_OK]
-		- <=0 	[error]
-		- >#sql_limit_value [error]
-	- formattazione email
-		- pattern equals username@dominio	[property valid_email]
-		- patter !equals username@dominio	[error]
 	-parametro id:
 		- valore id
 			- >0 	[property id_OK]

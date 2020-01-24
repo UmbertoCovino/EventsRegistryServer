@@ -41,7 +41,7 @@ class EventsJSONTest {
 	
 	@BeforeAll
 	public static void setUpBeforeAll() throws Exception {				
-		EventsRegistryWebApplication.main(null);
+		LaunchServerApp.execute();
 		gson = EventsRegistryWebApplication.GSON;
 
 		DBManager.executeUpdate("delete from users;");

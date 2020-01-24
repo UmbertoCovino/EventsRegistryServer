@@ -40,7 +40,7 @@ class UserPhotoJSONTest {
 
 	@BeforeAll
 	public static void setUpBeforeAll() throws Exception {				
-		EventsRegistryWebApplication.main(null);
+		LaunchServerApp.execute();
 		gson = EventsRegistryWebApplication.GSON;
 
 		DBManager.executeUpdate("delete from users;");
@@ -110,10 +110,6 @@ class UserPhotoJSONTest {
 	/* all parameters ok ---> 200 OK */
 	/* problem: error code returned ---> 415 Unsupported Media Type */
 	public void put1() throws ResourceException, IOException {
-		/*Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
-		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
-		client.handle(request);*/
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, "email_test@gmail.com", 
 				"password_test");
 		Request request = new Request(Method.PUT, url);
@@ -142,5 +138,5 @@ class UserPhotoJSONTest {
 	}
 	
 	
-	// restati test vanno fatti su logging e autorizzazione a fare il PUT
+	// restanti test vanno fatti su logging e autorizzazione a fare il PUT
 }

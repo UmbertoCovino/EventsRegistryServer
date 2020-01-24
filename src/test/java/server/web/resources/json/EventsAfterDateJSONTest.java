@@ -23,7 +23,7 @@ class EventsAfterDateJSONTest {
 	
 	@BeforeAll
 	public static void setUpBeforeAll() throws Exception {				
-		EventsRegistryWebApplication.main(null);
+		LaunchServerApp.execute();
 	}
 	
 	@AfterAll

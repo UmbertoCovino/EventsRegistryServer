@@ -38,7 +38,7 @@ class EventSubscribersJSONTest {
 	
 	@BeforeAll
 	public static void setUpBeforeAll() throws Exception {				
-		EventsRegistryWebApplication.main(null);
+		LaunchServerApp.execute();
 		gson = EventsRegistryWebApplication.GSON;
 		client = new Client(Protocol.HTTP);
 
@@ -60,6 +60,8 @@ class EventSubscribersJSONTest {
 	@AfterAll
 	public static void tearDownAfterClass() throws Exception {
 		DBManager.executeUpdate("delete from events_users_participations;");
+		DBManager.executeUpdate("delete from events;");
+		DBManager.executeUpdate("delete from users;");
 	}
 	
 	@BeforeEach

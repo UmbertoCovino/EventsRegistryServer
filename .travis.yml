@@ -1,5 +1,11 @@
 language: java
 
+services:
+  - mysql
+
+before_install:
+  - mysql -e < ./events_registry.sql
+
 script: mvn clean compile package
    
 notifications:

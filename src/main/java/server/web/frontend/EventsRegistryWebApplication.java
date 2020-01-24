@@ -86,21 +86,22 @@ public class EventsRegistryWebApplication extends Application {
 		public String dbPassword;
 		
 		public boolean hasSomeVoidField() {
-			return !(port != 0
-					 && webDir != null
-					 && storageDir != null
-					 && eventsPhotosDir != null
-					 && usersPhotosDir != null
-					 && dbName != null
-					 && dbUser != null
-					 && dbPassword != null
-					 && !webDir.equals("")
-					 && !storageDir.equals("")
-					 && !eventsPhotosDir.equals("")
-					 && !usersPhotosDir.equals("")
-					 && !dbName.equals("")
-					 && !dbUser.equals("")
-					 && !dbPassword.equals(""));
+			return (port == 0
+					 || webDir == null
+					 || storageDir == null
+					 || eventsPhotosDir == null
+					 || usersPhotosDir == null
+					 || dbName == null
+					 || dbUser == null
+					 //|| dbPassword == null
+					 || webDir.equals("")
+					 || storageDir.equals("")
+					 || eventsPhotosDir.equals("")
+					 || usersPhotosDir.equals("")
+					 || dbName.equals("")
+					 || dbUser.equals("")
+					 //|| dbPassword.equals("")
+			       );
 		}
 	}
 		

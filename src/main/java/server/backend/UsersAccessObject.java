@@ -14,6 +14,13 @@ import commons.exceptions.VoidClassFieldException;
 public class UsersAccessObject {
 	
 	
+	public static boolean isEmailValid(String email) {
+		String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+
+		return email.matches(regex);
+	}
+	
+	
 	
 	// GETTERS ----------------------------------------------------------------------------------------------
 
@@ -39,6 +46,10 @@ public class UsersAccessObject {
 		
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
@@ -65,6 +76,10 @@ public class UsersAccessObject {
 		
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
@@ -92,6 +107,10 @@ public class UsersAccessObject {
 
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select name from users where email = '" + email + "';");
@@ -114,6 +133,10 @@ public class UsersAccessObject {
 
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select surname from users where email = '" + email + "';");
@@ -136,6 +159,10 @@ public class UsersAccessObject {
 
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select password from users where email = '" + email + "';");
@@ -158,6 +185,10 @@ public class UsersAccessObject {
 
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select photo_path from users where email = '" + email + "';");
@@ -177,6 +208,13 @@ public class UsersAccessObject {
 	
 	public synchronized static ArrayList<Event> getUserEvents(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		ArrayList<Event> events = new ArrayList<>();
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		
 		User user = getUser(email);
 		
@@ -260,14 +298,26 @@ public class UsersAccessObject {
 
 		if (user.getEmail() == null || user.getEmail().equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (user.getEmail().length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(user.getEmail()))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		else if (user.getName() == null || user.getName().equals(""))
 			throw new VoidClassFieldException("The name passed cannot be null or empty.");
+		else if (user.getName().length() > 80)
+			throw new VoidClassFieldException("The name passed cannot be over 80 chars.");
 		else if (user.getSurname() == null || user.getSurname().equals(""))
 			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
+		else if (user.getSurname().length() > 80)
+			throw new VoidClassFieldException("The surname passed cannot be over 80 chars.");
 		else if (user.getPassword() == null || user.getPassword().equals(""))
 			throw new VoidClassFieldException("The password passed cannot be null or empty.");
+		else if (user.getPassword().length() > 20)
+			throw new VoidClassFieldException("The password passed cannot be over 20 chars.");
 		else if (user.getPhotoPath() == null || user.getPhotoPath().equals(""))
 			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
+		else if (user.getPhotoPath().length() > 80)
+			throw new VoidClassFieldException("The photo path passed cannot be over 80 chars.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + user.getEmail() + "';");
@@ -301,12 +351,22 @@ public class UsersAccessObject {
 		
 		if (user.getEmail() == null || user.getEmail().equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (user.getEmail().length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(user.getEmail()))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		else if (user.getName() == null || user.getName().equals(""))
 			throw new VoidClassFieldException("The name passed cannot be null or empty.");
+		else if (user.getName().length() > 80)
+			throw new VoidClassFieldException("The name passed cannot be over 80 chars.");
 		else if (user.getSurname() == null || user.getSurname().equals(""))
 			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
+		else if (user.getSurname().length() > 80)
+			throw new VoidClassFieldException("The surname passed cannot be over 80 chars.");
 		else if (user.getPassword() == null || user.getPassword().equals(""))
 			throw new VoidClassFieldException("The password passed cannot be null or empty.");
+		else if (user.getPassword().length() > 20)
+			throw new VoidClassFieldException("The password passed cannot be over 20 chars.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + user.getEmail() + "';");
@@ -337,8 +397,14 @@ public class UsersAccessObject {
 		
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		else if (name == null || name.equals(""))
 			throw new VoidClassFieldException("The name passed cannot be null or empty.");
+		else if (name.length() > 80)
+			throw new VoidClassFieldException("The name passed cannot be over 80 chars.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
@@ -366,8 +432,14 @@ public class UsersAccessObject {
 
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		else if (surname == null || surname.equals(""))
 			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
+		else if (surname.length() > 80)
+			throw new VoidClassFieldException("The surname passed cannot be over 80 chars.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
@@ -395,8 +467,14 @@ public class UsersAccessObject {
 
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		else if (password == null || password.equals(""))
 			throw new VoidClassFieldException("The password passed cannot be null or empty.");
+		else if (password.length() > 20)
+			throw new VoidClassFieldException("The password passed cannot be over 20 chars.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
@@ -424,8 +502,14 @@ public class UsersAccessObject {
 
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		else if (photoPath == null || photoPath.equals(""))
 			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
+		else if (photoPath.length() > 80)
+			throw new VoidClassFieldException("The photo path passed cannot be over 80 chars.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
@@ -457,6 +541,10 @@ public class UsersAccessObject {
 
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");

@@ -100,7 +100,8 @@ public class EventsRegistryWebApplication extends Application {
 					 || usersPhotosDir.equals("")
 					 || dbName.equals("")
 					 || dbUser.equals("")
-					 //|| dbPassword.equals(""));
+					 //|| dbPassword.equals("")
+			       );
 		}
 	}
 		

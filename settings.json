@@ -1,10 +1,10 @@
 {
-	"port": "8183",
+	"port": "8182",
 	"webDir": "web",
 	"storageDir": "storage",
 	"eventsPhotosDir": "events_photos",
 	"usersPhotosDir": "users_photos",
 	"dbName": "events_registry",
 	"dbUser": "root",
-	"dbPassword": ""
+	"dbPassword": "qwerty"
 }

@@ -84,9 +84,9 @@ public class TelegramUsersAccessObject {
 		return ++token;
 	}
 	
-	public synchronized int sizeTokenMap() {
-		return token_map.size();
-	}
+//	public synchronized int sizeTokenMap() {
+//		return token_map.size();
+//	}
 	
 	public synchronized User getUserByToken(Integer token) {
 		User user = token_map.get(token);
@@ -103,38 +103,38 @@ public class TelegramUsersAccessObject {
 		token_map.put(token, user);
 	}
 
-	public synchronized void removeUserByToken(int token) throws InvalidUserTokenException {
-		if (!token_map.containsKey(token)) 
-			throw new InvalidUserTokenException("Invalid user token: " + token);
-		
-		token_map.remove(token);			
-	}
-	
-	///////////////////////////////////////////// chat_id_map management /////////////////////////////////////////////////
-	
-	public synchronized int sizeChatIdMap() {
-		return token_map.size();
-	}
-	
-	public synchronized Long getChatIdByEmail(String email) {
-		Long chat_id = chat_id_map.get(email);
-
-		if (chat_id != null)
-			return chat_id;
-		else return (long) 0;
-	}
-	
-	public synchronized void addChatIdByEmail(String email, Long chat_id) throws InvalidUserEmailException {
-		if (chat_id_map.containsKey(email)) 
-			throw new InvalidUserEmailException("Duplicated email: " + email);
-		
-		chat_id_map.put(email, chat_id);
-	}
-	
-	public synchronized void removeChatIdByEmail(String email) throws InvalidUserEmailException {
-		if (!chat_id_map.containsKey(email)) 
-			throw new InvalidUserEmailException("Invalid user email: " + email);
-		
-		chat_id_map.remove(email);			
-	}
+//	public synchronized void removeUserByToken(int token) throws InvalidUserTokenException {
+//		if (!token_map.containsKey(token))
+//			throw new InvalidUserTokenException("Invalid user token: " + token);
+//
+//		token_map.remove(token);
+//	}
+//
+//	///////////////////////////////////////////// chat_id_map management /////////////////////////////////////////////////
+//
+//	public synchronized int sizeChatIdMap() {
+//		return token_map.size();
+//	}
+//
+//	public synchronized Long getChatIdByEmail(String email) {
+//		Long chat_id = chat_id_map.get(email);
+//
+//		if (chat_id != null)
+//			return chat_id;
+//		else return (long) 0;
+//	}
+//
+//	public synchronized void addChatIdByEmail(String email, Long chat_id) throws InvalidUserEmailException {
+//		if (chat_id_map.containsKey(email))
+//			throw new InvalidUserEmailException("Duplicated email: " + email);
+//
+//		chat_id_map.put(email, chat_id);
+//	}
+//
+//	public synchronized void removeChatIdByEmail(String email) throws InvalidUserEmailException {
+//		if (!chat_id_map.containsKey(email))
+//			throw new InvalidUserEmailException("Invalid user email: " + email);
+//
+//		chat_id_map.remove(email);
+//	}
 }

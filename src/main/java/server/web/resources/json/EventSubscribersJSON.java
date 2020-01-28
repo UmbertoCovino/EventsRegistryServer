@@ -54,13 +54,14 @@ public class EventSubscribersJSON extends ServerResource {
 	public String addSubscriber(String payload) {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));
-		
-		String email = gson.fromJson(payload, String.class);
-		try {
+
+        String email = gson.fromJson(payload, String.class);
+
+        try {
 
 			if (!getClientInfo().getUser().getIdentifier().equals(email))
-				throw new UnauthorizedUserException("You are not authorized.");
-			
+                throw new UnauthorizedUserException("You are not authorized.");
+
 			EventsAccessObject.addEventSubscriber(id, email);		
 			
 			return gson.toJson(true, boolean.class);
@@ -101,7 +102,7 @@ public class EventSubscribersJSON extends ServerResource {
 		
 		try {
 			if (email == null)
-				throw new UnauthorizedUserException("You are not authorized. You have to specify the subscriber email in the URI.");
+				throw new VoidClassFieldException("You are not authorized. You have to specify the subscriber email in the URI.");
 			
 			if (!getClientInfo().getUser().getIdentifier().equals(email))
 				throw new UnauthorizedUserException("You are not authorized.");

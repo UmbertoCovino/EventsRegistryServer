@@ -25,8 +25,10 @@ import server.web.frontend.EventsRegistryWebApplication;
 class UserJSONTest {
 
 	private static Gson gson = new Gson();
+	private static Client client;
 	private static String url = "http://localhost:8182/eventsRegistry/users/";
-	
+	private static User user;
+
 	@BeforeAll
 	public static void setUpBeforeAll() throws Exception {				
 		LaunchServerApp.execute();
@@ -38,12 +40,10 @@ class UserJSONTest {
 	
 	@BeforeEach
 	public void setUp() throws Exception {
-		DBManager.executeUpdate("delete from users;");
 	}
 	
 	@AfterEach
 	public void tearDown() throws Exception {
-		DBManager.executeUpdate("delete from users;");
 	}
 	
 	/////////////////////////////////////////GET////////////////////////////////////////////////////////////
@@ -53,16 +53,16 @@ class UserJSONTest {
 	 * Sì perché mi restituisce un oggetto User senza password */
 	public void testGet1() {
 		String url_users = "http://localhost:8182/eventsRegistry/users";
-		Client client = new Client(Protocol.HTTP);
+		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", "email_test.jpg");
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
-		
+
 		request = new Request(Method.GET, url + user.getEmail());
 		Response jsonResponse =  client.handle(request);
 		
-		user = new User("name_test", "surname_test", "email_test", "email_test.jpg");
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "email_test@gmail.com.jpg");
 		User got_user = gson.fromJson(jsonResponse.getEntityAsText(), User.class);
 		
 		assertEquals(user.toString(), got_user.toString()); 
@@ -74,16 +74,33 @@ class UserJSONTest {
 	/* wrong parameter: invalid attribute email ---> INVALID_USER_EMAIL = 900 */
 	public void testGet2() {
 		String url_users = "http://localhost:8182/eventsRegistry/users";
-		Client client = new Client(Protocol.HTTP);
+		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", "email_test.jpg");
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
-		
-		request = new Request(Method.GET, url + "email_test_INVALID");
+
+		request = new Request(Method.GET, url + "email_test_INVALID@gmail.com");
 		Response jsonResponse =  client.handle(request);
 		
 		assertEquals(900, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* VOID_CLASS_FIELD = 950 */
+	public void testGet3() {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		user = new User("name_test", "surname_test", "email_test@gmail.com",
+				"password_test", "email_test.jpg");
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+
+		request = new Request(Method.GET, url + "invalid_email_void_parameter");
+		Response jsonResponse =  client.handle(request);
+
+		assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 	
 	///////////////////////////////////////////POST//////////////////////////////////////////////////////
@@ -97,20 +114,56 @@ class UserJSONTest {
 	/* authorized user (email_logged_user equals USER_email_passed) ---> 200 OK */
 	public void delete1() {
 		String url_users = "http://localhost:8182/eventsRegistry/users";
-		Client client = new Client(Protocol.HTTP);
+		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
-		
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test", "password_test");
-		
-		request = new Request(Method.DELETE, url + "email_test");
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+
+		request = new Request(Method.DELETE, url + "email_test@gmail.com");
 		request.setChallengeResponse(challengeResponse);
 		Response jsonResponse = client.handle(request);
 		
-		assertEquals("User with email " + "email_test" + " removed.", gson.fromJson(jsonResponse.getEntityAsText(), String.class));
+		assertEquals("User with email " + "email_test@gmail.com" + " removed.", gson.fromJson(jsonResponse.getEntityAsText(), String.class));
 	}
-	
+
+	@Test
+	/* UNAUTHORIZED_USER = 901 */
+	public void delete2() {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+
+		request = new Request(Method.DELETE, url + "email_test_UNEQUAL@gmail.com");
+		request.setChallengeResponse(challengeResponse);
+		Response jsonResponse = client.handle(request);
+
+		assertEquals(901, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* UNAUTHORIZED_USER = 901 */
+	public void delete3() {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+
+		request = new Request(Method.DELETE, url + "email_test_UNEQUAL@gmail.com");
+		request.setChallengeResponse(challengeResponse);
+		Response jsonResponse = client.handle(request);
+
+		assertEquals(901, jsonResponse.getStatus().getCode());
+	}
 }

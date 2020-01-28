@@ -38,10 +38,10 @@ class UserTelegramJSONTest {
 		// add a user for resource with guard		
 		Client client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url);
-		User user1 = new User("name_test_1", "surname_test_1", "email_test_1", "password_test_1", null);
+		User user1 = new User("name_test_1", "surname_test_1", "email_test_1@gmail.com", "password_test_1", null);
 		request.setEntity(gson.toJson(user1, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
-		User user2 = new User("name_test_2", "surname_test_2", "email_test_2", "password_test_2", null);
+		User user2 = new User("name_test_2", "surname_test_2", "email_test_2@gmail.com", "password_test_2", null);
 		request.setEntity(gson.toJson(user2, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
 	}
@@ -64,10 +64,10 @@ class UserTelegramJSONTest {
 	@Test
 	/* email parameter OK user logged and authorized ---> return: 200 OK, valid token*/
 	public void testGet1() {
-		String email = "email_test_1";
+		String email = "email_test_1@gmail.com";
 		Request request = new Request(Method.GET, url + "/" + email + "/telegram");
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test_1", "password_test_1");
+				"email_test_1@gmail.com", "password_test_1");
 		
 		request.setChallengeResponse(challengeResponse);	
 		Response jsonResponse = client.handle(request);
@@ -78,10 +78,10 @@ class UserTelegramJSONTest {
 	@Test
 	/* wrong user credentials ---> 401 */
 	public void testGet2() {
-		String email = "email_test";
+		String email = "email_test_1@gmail.com";
 		Request request = new Request(Method.GET, url + "/" + email + "/telegram");
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test_1", "password_test_1_WRONG");
+				"email_test_1@gmail.com", "password_test_1_WRONG");
 		
 		request.setChallengeResponse(challengeResponse);	
 		Response jsonResponse = client.handle(request);
@@ -92,10 +92,10 @@ class UserTelegramJSONTest {
 	@Test
 	/* invalid email passed as attribute ---> INVALID_USER_EMAIL = 900 */
 	public void testGet3() {
-		String email = "email_test_INVALID";
+		String email = "email_test_INVALID@gmail.com";
 		Request request = new Request(Method.GET, url + "/" + email + "/telegram");
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test_1", "password_test_1");
+				"email_test_1@gmail.com", "password_test_1");
 		
 		request.setChallengeResponse(challengeResponse);	
 		Response jsonResponse = client.handle(request);
@@ -106,10 +106,10 @@ class UserTelegramJSONTest {
 	@Test
 	/* email passed as attribute valid but not equals to email of logged user ---> UNAUTHORIZED_USER = 901 */
 	public void testGet4() {
-		String email = "email_test_2";
+		String email = "email_test_2@gmail.com";
 		Request request = new Request(Method.GET, url + "/" + email + "/telegram");
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test_1", "password_test_1");
+				"email_test_1@gmail.com", "password_test_1");
 		
 		request.setChallengeResponse(challengeResponse);	
 		Response jsonResponse = client.handle(request);

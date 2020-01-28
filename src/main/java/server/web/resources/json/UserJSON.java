@@ -51,48 +51,48 @@ public class UserJSON extends ServerResource {
 		}
     }
 	
-	@Post("json")
-    public String getUserIfPasswordIsCorrect(String payload) throws ParseException {
-		Gson gson = EventsRegistryWebApplication.GSON;
-
-		String password;
-		try {
-			password = gson.fromJson(payload, String.class);
-		} catch (JsonSyntaxException e) {
-			Status status = new Status(ErrorCodes.JSON_PARSING);
-			setStatus(status);
-			
-			return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
-		}
-		
-		try {
-			User user = UsersAccessObject.getUserWithPassword(getAttribute("email"));
-			
-			if (password != null && password.equals(user.getPassword())) // valutare l'opzione di restituire un booleano
-				return gson.toJson(user.cloneWithoutPassword(), User.class);
-			else {
-				Status status = new Status(404);
-				setStatus(status);
-				
-				return gson.toJson(null, User.class);
-			}
-		} catch (InvalidUserEmailException e) {
-			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);
-			setStatus(status);
-			
-			return gson.toJson(e, InvalidUserEmailException.class);
-		} catch (VoidClassFieldException e) {
-			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
-			setStatus(status);
-			
-			return gson.toJson(e, VoidClassFieldException.class);
-		} catch (GenericSQLException e) {
-			Status status = new Status(ErrorCodes.GENERIC_SQL);
-			setStatus(status);
-			
-			return gson.toJson(e, GenericSQLException.class);
-		}
-    }
+//	@Post("json")
+//    public String getUserIfPasswordIsCorrect(String payload) throws ParseException {
+//		Gson gson = EventsRegistryWebApplication.GSON;
+//
+//		String password;
+//		try {
+//			password = gson.fromJson(payload, String.class);
+//		} catch (JsonSyntaxException e) {
+//			Status status = new Status(ErrorCodes.JSON_PARSING);
+//			setStatus(status);
+//
+//			return gson.toJson(new JsonParsingException(e.getMessage()), JsonParsingException.class);
+//		}
+//
+//		try {
+//			User user = UsersAccessObject.getUserWithPassword(getAttribute("email"));
+//
+//			if (password != null && password.equals(user.getPassword())) // valutare l'opzione di restituire un booleano
+//				return gson.toJson(user.cloneWithoutPassword(), User.class);
+//			else {
+//				Status status = new Status(404);
+//				setStatus(status);
+//
+//				return gson.toJson(null, User.class);
+//			}
+//		} catch (InvalidUserEmailException e) {
+//			Status status = new Status(ErrorCodes.INVALID_USER_EMAIL);
+//			setStatus(status);
+//
+//			return gson.toJson(e, InvalidUserEmailException.class);
+//		} catch (VoidClassFieldException e) {
+//			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+//			setStatus(status);
+//
+//			return gson.toJson(e, VoidClassFieldException.class);
+//		} catch (GenericSQLException e) {
+//			Status status = new Status(ErrorCodes.GENERIC_SQL);
+//			setStatus(status);
+//
+//			return gson.toJson(e, GenericSQLException.class);
+//		}
+//    }
     
     @Delete("json")
     public String deleteUser() {

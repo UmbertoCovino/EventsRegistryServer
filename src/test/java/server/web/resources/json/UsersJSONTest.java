@@ -32,6 +32,7 @@ public class UsersJSONTest {
 	
 	@AfterAll
 	public static void tearDownAfterClass() throws Exception {
+		DBManager.executeUpdate("delete from users;");
 	}
 	
 	@BeforeEach
@@ -47,18 +48,41 @@ public class UsersJSONTest {
 	/* è corretto far restituire una lista utenti ad un utente loggato (?) */
 	@Test
 	public void testGet1() {
-		String url = "http://localhost:8182/eventsRegistry/eventsRegistry/users";
+		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
-		/* ... */
+		Request request = new Request(Method.GET, url);
+
+		Response jsonResponse = client.handle(request);
+		Assertions.assertEquals(200, jsonResponse.getStatus().getCode());
 	}
-	
+
+	/* è corretto far restituire una lista utenti ad un utente loggato (?) */
+	@Test
+	/* users size > 0 */
+	public void testGet2() {
+		String url = "http://localhost:8182/eventsRegistry/users";
+		Client client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+
+		client = new Client(Protocol.HTTP);
+		request = new Request(Method.GET, url);
+
+		Response jsonResponse = client.handle(request);
+		Assertions.assertEquals(200, jsonResponse.getStatus().getCode());
+	}
+
+	/////////////////////////////////////////POST/////////////////////////////////////////////////////
+
 	@Test
 	/* adding a user to app */
 	public void testPost1() {
 		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 
@@ -71,9 +95,10 @@ public class UsersJSONTest {
 		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
+
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse2 = client.handle(request);
 		
@@ -81,7 +106,7 @@ public class UsersJSONTest {
 	}
 	
 	@Test
-	/* adding two user with wrong credentials: empty space as email*/
+	/* adding user with wrong credentials: empty space as email*/
 	public void testPost3() {
 		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
@@ -94,12 +119,12 @@ public class UsersJSONTest {
 	}
 	
 	@Test
-	/* adding two user with wrong credentials: empty space as name*/
+	/* adding user with wrong credentials: empty space as name*/
 	public void testPost4() {
 		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url);
-		User user = new User("", "surname_test", "email_test", "password_test", null);
+		User user = new User("", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
@@ -107,12 +132,12 @@ public class UsersJSONTest {
 	}
 	
 	@Test
-	/* adding two user with wrong credentials: empty space as surname*/
+	/* adding user with wrong credentials: empty space as surname*/
 	public void testPost5() {
 		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "", "email_test", "password_test", null);
+		User user = new User("name_test", "", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
@@ -120,12 +145,13 @@ public class UsersJSONTest {
 	}
 	
 	@Test
-	/* adding two user with wrong credentials: empty space as password*/
+	/* adding user with wrong credentials: empty space as password*/
 	public void testPost6() {
 		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "", null);
+		User user = new User("name_test", "surname_test",
+				"email_test_wrong_cr@gmail.com", "", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
@@ -138,14 +164,14 @@ public class UsersJSONTest {
 		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
 				
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test", "password_test");
+				"email_test@gmail.com", "password_test");
 		request = new Request(Method.PUT, url);
-		user = new User("name_test_UPDATE", "surname_test_UPDATE", "email_test", "password_test_UPDATE", null);
+		user = new User("name_test_UPDATE", "surname_test_UPDATE", "email_test@gmail.com", "password_test_UPDATE", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		request.setChallengeResponse(challengeResponse);
 		Response jsonResponse = client.handle(request);
@@ -161,15 +187,15 @@ public class UsersJSONTest {
 		Client client = new Client(Protocol.HTTP);
 		
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
 		
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test", "password_test");
+				"email_test@gmail.com", "password_test");
 		request = new Request(Method.PUT, url);
 		request.setChallengeResponse(challengeResponse);
-		user = new User("", "surname_test_UPDATE", "email_test", "password_test_UPDATE", null);
+		user = new User("", "surname_test_UPDATE", "email_test@gmail.com", "password_test_UPDATE", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
@@ -184,14 +210,15 @@ public class UsersJSONTest {
 		Client client = new Client(Protocol.HTTP);
 		
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
 		
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test", "password_test");
+				"email_test@gmail.com", "password_test");
 		request = new Request(Method.PUT, url);
-		request.setChallengeResponse(challengeResponse);		user = new User("name_test_UPDATE", "", "email_test", "password_test_UPDATE", null);
+		request.setChallengeResponse(challengeResponse);
+		user = new User("name_test_UPDATE", "", "email_test@gmail.com", "password_test_UPDATE", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
@@ -206,15 +233,15 @@ public class UsersJSONTest {
 		Client client = new Client(Protocol.HTTP);
 		
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
 		
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test", "password_test");
+				"email_test@gmail.com", "password_test");
 		request = new Request(Method.PUT, url);
 		request.setChallengeResponse(challengeResponse);		
-		user = new User("name_test_UPDATE", "surname_test_UPDATE", "email_test", "", null);
+		user = new User("name_test_UPDATE", "surname_test_UPDATE", "email_test@gmail.com", "", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 		
@@ -228,12 +255,12 @@ public class UsersJSONTest {
 		Client client = new Client(Protocol.HTTP);
 		
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
 		
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test", "password_test");
+				"email_test@gmail.com", "password_test");
 		
 		request = new Request(Method.PUT, url);
 		request.setChallengeResponse(challengeResponse);		
@@ -251,12 +278,12 @@ public class UsersJSONTest {
 		Client client = new Client(Protocol.HTTP);
 		
 		Request request = new Request(Method.POST, url);
-		User user = new User("name_test", "surname_test", "email_test", "password_test", null);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
 		
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test", "password_test_WRONG");
+				"email_test@gmail.com", "password_test_WRONG");
 		
 		request = new Request(Method.PUT, url);
 		request.setChallengeResponse(challengeResponse);		

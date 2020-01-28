@@ -24,22 +24,22 @@ public class UsersAccessObject {
 	
 	// GETTERS ----------------------------------------------------------------------------------------------
 
-	public synchronized static int getNumberOfUsers() throws GenericSQLException {
-		Integer usersNumber = null;
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users;");
-			
-			if (rs.next())
-				usersNumber = rs.getInt("users_number");
-			
-			rs.close();
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		return usersNumber;
-	}
+//	public synchronized static int getNumberOfUsers() throws GenericSQLException {
+//		Integer usersNumber = null;
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users;");
+//
+//			if (rs.next())
+//				usersNumber = rs.getInt("users_number");
+//
+//			rs.close();
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		return usersNumber;
+//	}
 	
 	public synchronized static User getUser(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		User user = null;
@@ -71,88 +71,88 @@ public class UsersAccessObject {
 		return user;
 	}
 	
-	public synchronized static User getUserWithPassword(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-		User user = null;
-		
-		if (email == null || email.equals(""))
-			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
-
-			if (rs.next()) {
-				String name = rs.getString("name");
-				String surname = rs.getString("surname");
-				String password = rs.getString("password");
-				String photoPath = rs.getString("photo_path");
-				
-				user = new User(name, surname, email, password, photoPath);
-			} else
-				throw new InvalidUserEmailException("Inexistent user email: " + email);
-			
-			rs.close();
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		return user;
-	}
+//	public synchronized static User getUserWithPassword(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+//		User user = null;
+//
+//		if (email == null || email.equals(""))
+//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+//		else if (email.length() > 80)
+//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+//		else if (!isEmailValid(email))
+//			throw new VoidClassFieldException("The email passed is not valid.");
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
+//
+//			if (rs.next()) {
+//				String name = rs.getString("name");
+//				String surname = rs.getString("surname");
+//				String password = rs.getString("password");
+//				String photoPath = rs.getString("photo_path");
+//
+//				user = new User(name, surname, email, password, photoPath);
+//			} else
+//				throw new InvalidUserEmailException("Inexistent user email: " + email);
+//
+//			rs.close();
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		return user;
+//	}
 	
-	public synchronized static String getUserName(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-		String name = null;
-
-		if (email == null || email.equals(""))
-			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select name from users where email = '" + email + "';");
-
-			if (rs.next()) {
-				name = rs.getString("name");
-			} else
-				throw new InvalidUserEmailException("Inexistent user email: " + email);
-			
-			rs.close();
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		return name;
-	}
+//	public synchronized static String getUserName(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+//		String name = null;
+//
+//		if (email == null || email.equals(""))
+//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+//		else if (email.length() > 80)
+//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+//		else if (!isEmailValid(email))
+//			throw new VoidClassFieldException("The email passed is not valid.");
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select name from users where email = '" + email + "';");
+//
+//			if (rs.next()) {
+//				name = rs.getString("name");
+//			} else
+//				throw new InvalidUserEmailException("Inexistent user email: " + email);
+//
+//			rs.close();
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		return name;
+//	}
 	
-	public synchronized static String getUserSurname(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-		String surname = null;
-
-		if (email == null || email.equals(""))
-			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select surname from users where email = '" + email + "';");
-
-			if (rs.next()) {
-				surname = rs.getString("surname");
-			} else
-				throw new InvalidUserEmailException("Inexistent user email: " + email);
-			
-			rs.close();
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		return surname;
-	}
+//	public synchronized static String getUserSurname(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+//		String surname = null;
+//
+//		if (email == null || email.equals(""))
+//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+//		else if (email.length() > 80)
+//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+//		else if (!isEmailValid(email))
+//			throw new VoidClassFieldException("The email passed is not valid.");
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select surname from users where email = '" + email + "';");
+//
+//			if (rs.next()) {
+//				surname = rs.getString("surname");
+//			} else
+//				throw new InvalidUserEmailException("Inexistent user email: " + email);
+//
+//			rs.close();
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		return surname;
+//	}
 	
 	public synchronized static String getUserPassword(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 		String password = null;
@@ -186,9 +186,9 @@ public class UsersAccessObject {
 		if (email == null || email.equals(""))
 			throw new VoidClassFieldException("The email passed cannot be null or empty.");
 		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+			throw new InvalidUserEmailException("The email passed cannot be over 80 chars.");
 		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
+			throw new InvalidUserEmailException("The email passed is not valid.");
 		
 		try {
 			ResultSet rs = DBManager.executeQuery("select photo_path from users where email = '" + email + "';");
@@ -206,45 +206,45 @@ public class UsersAccessObject {
 		return photoPath;
 	}
 	
-	public synchronized static ArrayList<Event> getUserEvents(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-		ArrayList<Event> events = new ArrayList<>();
-
-		if (email == null || email.equals(""))
-			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
-		
-		User user = getUser(email);
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select * "
-											   + "from events "
-											   + "where user_owner_email = '" + email + "' "
-											   + "order by start_date;");
-			
-			while (rs.next()) {
-				int id = rs.getInt("id");
-				String title = rs.getString("title");
-				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
-				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
-				String description = rs.getString("description");
-				String photoPath = rs.getString("photo_path");
-				String ownerEmail = rs.getString("user_owner_email");
-				
-				Event event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, user);
-				
-				events.add(event);
-			}
-			
-			rs.close();
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		return events;
-	}
+//	public synchronized static ArrayList<Event> getUserEvents(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+//		ArrayList<Event> events = new ArrayList<>();
+//
+//		if (email == null || email.equals(""))
+//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+//		else if (email.length() > 80)
+//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+//		else if (!isEmailValid(email))
+//			throw new VoidClassFieldException("The email passed is not valid.");
+//
+//		User user = getUser(email);
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select * "
+//											   + "from events "
+//											   + "where user_owner_email = '" + email + "' "
+//											   + "order by start_date;");
+//
+//			while (rs.next()) {
+//				int id = rs.getInt("id");
+//				String title = rs.getString("title");
+//				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
+//				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
+//				String description = rs.getString("description");
+//				String photoPath = rs.getString("photo_path");
+//				String ownerEmail = rs.getString("user_owner_email");
+//
+//				Event event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, user);
+//
+//				events.add(event);
+//			}
+//
+//			rs.close();
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		return events;
+//	}
 	
 	public synchronized static ArrayList<User> getUsers() throws GenericSQLException {
 		ArrayList<User> users = new ArrayList<>();
@@ -273,16 +273,16 @@ public class UsersAccessObject {
 
 	public synchronized static String[] getUsersEmails() throws GenericSQLException {
 		ArrayList<String> emails = new ArrayList<>();
-		
+
 		try {
 			ResultSet rs = DBManager.executeQuery("select email from users;");
-			
+
 			while (rs.next()) {
 				String email = rs.getString("email");
-				
+
 				emails.add(email);
 			}
-			
+
 			rs.close();
 		} catch (SQLException e) {
 			throw new GenericSQLException(e.getMessage());
@@ -392,145 +392,145 @@ public class UsersAccessObject {
 			throw new GenericSQLException("An error occurred while updating user to DB.");
 	}
 	
-	public synchronized static int updateUserName(String email, String name) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-		int result = 0;
-		
-		if (email == null || email.equals(""))
-			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
-		else if (name == null || name.equals(""))
-			throw new VoidClassFieldException("The name passed cannot be null or empty.");
-		else if (name.length() > 80)
-			throw new VoidClassFieldException("The name passed cannot be over 80 chars.");
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
-			
-			if (rs.next()) {
-				if (rs.getInt("users_number") == 0)
-					throw new InvalidUserEmailException("Inexistent user email: " + email);
-				
-				result = DBManager.executeUpdate("update users "
-											   + "set name = '" + name + "' "
-											   + "where email = '" + email + "';");
-			}
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		if (result == 1)
-			return 1;
-		else
-			throw new GenericSQLException("An error occurred while updating user to DB.");
-	}
+//	public synchronized static int updateUserName(String email, String name) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+//		int result = 0;
+//
+//		if (email == null || email.equals(""))
+//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+//		else if (email.length() > 80)
+//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+//		else if (!isEmailValid(email))
+//			throw new VoidClassFieldException("The email passed is not valid.");
+//		else if (name == null || name.equals(""))
+//			throw new VoidClassFieldException("The name passed cannot be null or empty.");
+//		else if (name.length() > 80)
+//			throw new VoidClassFieldException("The name passed cannot be over 80 chars.");
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
+//
+//			if (rs.next()) {
+//				if (rs.getInt("users_number") == 0)
+//					throw new InvalidUserEmailException("Inexistent user email: " + email);
+//
+//				result = DBManager.executeUpdate("update users "
+//											   + "set name = '" + name + "' "
+//											   + "where email = '" + email + "';");
+//			}
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		if (result == 1)
+//			return 1;
+//		else
+//			throw new GenericSQLException("An error occurred while updating user to DB.");
+//	}
 
-	public synchronized static int updateUserSurname(String email, String surname) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-		int result = 0;
+//	public synchronized static int updateUserSurname(String email, String surname) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+//		int result = 0;
+//
+//		if (email == null || email.equals(""))
+//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+//		else if (email.length() > 80)
+//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+//		else if (!isEmailValid(email))
+//			throw new VoidClassFieldException("The email passed is not valid.");
+//		else if (surname == null || surname.equals(""))
+//			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
+//		else if (surname.length() > 80)
+//			throw new VoidClassFieldException("The surname passed cannot be over 80 chars.");
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
+//
+//			if (rs.next()) {
+//				if (rs.getInt("users_number") == 0)
+//					throw new InvalidUserEmailException("Inexistent user email: " + email);
+//
+//				result = DBManager.executeUpdate("update users "
+//											   + "set surname = '" + surname + "' "
+//											   + "where email = '" + email + "';");
+//			}
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		if (result == 1)
+//			return 1;
+//		else
+//			throw new GenericSQLException("An error occurred while updating user to DB.");
+//	}
 
-		if (email == null || email.equals(""))
-			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
-		else if (surname == null || surname.equals(""))
-			throw new VoidClassFieldException("The surname passed cannot be null or empty.");
-		else if (surname.length() > 80)
-			throw new VoidClassFieldException("The surname passed cannot be over 80 chars.");
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
-			
-			if (rs.next()) {
-				if (rs.getInt("users_number") == 0)
-					throw new InvalidUserEmailException("Inexistent user email: " + email);
-				
-				result = DBManager.executeUpdate("update users "
-											   + "set surname = '" + surname + "' "
-											   + "where email = '" + email + "';");
-			}
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		if (result == 1)
-			return 1;
-		else
-			throw new GenericSQLException("An error occurred while updating user to DB.");
-	}
+//	public synchronized static int updateUserPassword(String email, String password) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+//		int result = 0;
+//
+//		if (email == null || email.equals(""))
+//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+//		else if (email.length() > 80)
+//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+//		else if (!isEmailValid(email))
+//			throw new VoidClassFieldException("The email passed is not valid.");
+//		else if (password == null || password.equals(""))
+//			throw new VoidClassFieldException("The password passed cannot be null or empty.");
+//		else if (password.length() > 20)
+//			throw new VoidClassFieldException("The password passed cannot be over 20 chars.");
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
+//
+//			if (rs.next()) {
+//				if (rs.getInt("users_number") == 0)
+//					throw new InvalidUserEmailException("Inexistent user email: " + email);
+//
+//				result = DBManager.executeUpdate("update users "
+//											   + "set password = '" + password + "' "
+//											   + "where email = '" + email + "';");
+//			}
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		if (result == 1)
+//			return 1;
+//		else
+//			throw new GenericSQLException("An error occurred while updating user to DB.");
+//	}
 
-	public synchronized static int updateUserPassword(String email, String password) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-		int result = 0;
-
-		if (email == null || email.equals(""))
-			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
-		else if (password == null || password.equals(""))
-			throw new VoidClassFieldException("The password passed cannot be null or empty.");
-		else if (password.length() > 20)
-			throw new VoidClassFieldException("The password passed cannot be over 20 chars.");
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
-			
-			if (rs.next()) {
-				if (rs.getInt("users_number") == 0)
-					throw new InvalidUserEmailException("Inexistent user email: " + email);
-				
-				result = DBManager.executeUpdate("update users "
-											   + "set password = '" + password + "' "
-											   + "where email = '" + email + "';");
-			}
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		if (result == 1)
-			return 1;
-		else
-			throw new GenericSQLException("An error occurred while updating user to DB.");
-	}
-
-	public synchronized static int updateUserPhotoPath(String email, String photoPath) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-		int result = 0;
-
-		if (email == null || email.equals(""))
-			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-		else if (email.length() > 80)
-			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-		else if (!isEmailValid(email))
-			throw new VoidClassFieldException("The email passed is not valid.");
-		else if (photoPath == null || photoPath.equals(""))
-			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
-		else if (photoPath.length() > 80)
-			throw new VoidClassFieldException("The photo path passed cannot be over 80 chars.");
-		
-		try {
-			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
-			
-			if (rs.next()) {
-				if (rs.getInt("users_number") == 0)
-					throw new InvalidUserEmailException("Inexistent user email: " + email);
-				
-				result = DBManager.executeUpdate("update users "
-											   + "set photo_path = '" + photoPath + "' "
-											   + "where email = '" + email + "';");
-			}
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-		
-		if (result == 1)
-			return 1;
-		else
-			throw new GenericSQLException("An error occurred while updating user to DB.");
-	}
+//	public synchronized static int updateUserPhotoPath(String email, String photoPath) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+//		int result = 0;
+//
+//		if (email == null || email.equals(""))
+//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+//		else if (email.length() > 80)
+//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+//		else if (!isEmailValid(email))
+//			throw new VoidClassFieldException("The email passed is not valid.");
+//		else if (photoPath == null || photoPath.equals(""))
+//			throw new VoidClassFieldException("The photo path passed cannot be null or empty.");
+//		else if (photoPath.length() > 80)
+//			throw new VoidClassFieldException("The photo path passed cannot be over 80 chars.");
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select count(*) as users_number from users where email = '" + email + "';");
+//
+//			if (rs.next()) {
+//				if (rs.getInt("users_number") == 0)
+//					throw new InvalidUserEmailException("Inexistent user email: " + email);
+//
+//				result = DBManager.executeUpdate("update users "
+//											   + "set photo_path = '" + photoPath + "' "
+//											   + "where email = '" + email + "';");
+//			}
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		if (result == 1)
+//			return 1;
+//		else
+//			throw new GenericSQLException("An error occurred while updating user to DB.");
+//	}
 	
 	
 

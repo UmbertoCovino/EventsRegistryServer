@@ -1,7 +1,6 @@
 package server.web.resources.json;
 
 import com.google.gson.Gson;
-import com.sun.scenario.Settings;
 import commons.User;
 import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidUserEmailException;

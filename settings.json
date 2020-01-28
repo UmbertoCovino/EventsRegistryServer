@@ -6,5 +6,5 @@
 	"usersPhotosDir": "users_photos",
 	"dbName": "events_registry",
 	"dbUser": "root",
-	"dbPassword": "angelo03"
+	"dbPassword": ""
 }

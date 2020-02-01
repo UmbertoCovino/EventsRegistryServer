@@ -6,8 +6,7 @@ import commons.User;
 import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidEventIdException;
 import commons.exceptions.VoidClassFieldException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -35,6 +34,22 @@ public class TelegramBotNotificationTest {
         DBManager.executeUpdate("delete from users;");
 
         preFillDb();
+    }
+
+    @AfterAll
+    public static void tearDownAfterClass() throws Exception {
+        DBManager.executeUpdate("delete from events_users_participations;");
+        DBManager.executeUpdate("delete from events;");
+        DBManager.executeUpdate("delete from users;");
+    }
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        DBManager.executeUpdate("delete from events_users_participations;");
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
     }
 
     public static void preFillDb() throws InvalidEventIdException, VoidClassFieldException, GenericSQLException, ParseException {

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.google.gson.Gson;
 import commons.Event;
 import commons.User;
+import commons.exceptions.ErrorCodes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -20,6 +21,11 @@ import org.restlet.data.Protocol;
 import server.backend.DBManager;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.Reader;
+import java.sql.SQLException;
 
 class EventsBeforeDateJSONTest {
 
@@ -49,7 +55,7 @@ class EventsBeforeDateJSONTest {
 	
 	@AfterAll
 	public static void tearDownAfterClass() throws Exception {
-		DBManager.executeUpdate("delete from events;");
+	    DBManager.executeUpdate("delete from events;");
 	}
 	
 	@BeforeEach
@@ -77,7 +83,17 @@ class EventsBeforeDateJSONTest {
 		Request request = new Request(Method.GET, url+"/before/"+"2020.01.10 10:00:00");
 		Response jsonResponse = client.handle(request);
 
-		assertEquals(953, jsonResponse.getStatus().getCode());
+		assertEquals(ErrorCodes.DATE_PARSING, jsonResponse.getStatus().getCode());
 	}
 
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testGet3() throws SQLException {
+		DBManager.executeUpdate("drop database events_registry;");
+		Request request = new Request(Method.GET, url+"/before/"+"2020-01-10 10:00:00");
+		Response jsonResponse = client.handle(request);
+
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+        DBManager.createDB();
+    }
 }

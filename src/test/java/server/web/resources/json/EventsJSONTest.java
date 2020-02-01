@@ -3,11 +3,13 @@ package server.web.resources.json;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import commons.exceptions.ErrorCodes;
 import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidEventIdException;
 import commons.exceptions.VoidClassFieldException;
@@ -49,7 +51,10 @@ class EventsJSONTest {
 		gson = EventsRegistryWebApplication.GSON;
 
 		DBManager.executeUpdate("delete from users;");
-		
+		addDefaultUser();
+	}
+
+	public static void addDefaultUser(){
 		// add a user for resource with guard
 		String url = "http://localhost:8182/eventsRegistry/users";
 		Client client = new Client(Protocol.HTTP);
@@ -59,6 +64,7 @@ class EventsJSONTest {
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
 		client.handle(request);
 	}
+
 	
 	@AfterAll
 	public static void tearDownAfterClass() throws Exception {
@@ -84,7 +90,19 @@ class EventsJSONTest {
 
 		assertEquals(200, jsonResponse.getStatus().getCode());
 	}
-	
+
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testGet2() throws SQLException {
+		DBManager.executeUpdate("drop database events_registry;");
+		Request request = new Request(Method.GET, url);
+		Response jsonResponse = client.handle(request);
+
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
+		addDefaultUser();
+	}
+
 	/////////////////////////////////////////////POST///////////////////////////////////////////////
 	
 	@Test
@@ -154,16 +172,34 @@ class EventsJSONTest {
 	/* description parameter empty space ---> VOID_CLASS_FIELD = 950 */
 	public void testPost5() throws ParseException {
 		Request request = new Request(Method.POST, url);
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
 				"email_test@gmail.com", "password_test");
 		Date startDate = Event.DATETIME_SDF.parse("2020-01-15 19:26:00");
-		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00"); 
+		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00");
 		Event event = new Event("title_test", startDate, endDate, "");
-		request.setChallengeResponse(challengeResponse);	
+		request.setChallengeResponse(challengeResponse);
 		request.setEntity(gson.toJson(event, Event.class), MediaType.APPLICATION_JSON);
 		Response jsonResponse = client.handle(request);
 
 		assertEquals(950, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testPost6() throws ParseException, SQLException {
+		Request request = new Request(Method.POST, url);
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"),
+				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
+		request.setChallengeResponse(challengeResponse);
+		request.setEntity(gson.toJson(event, Event.class), MediaType.APPLICATION_JSON);
+
+		DBManager.executeUpdate("drop database events_registry;");
+		Response jsonResponse = client.handle(request);
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
+		addDefaultUser();
 	}
 
 	/////////////////////////////////////////////PUT///////////////////////////////////////////////
@@ -278,5 +314,33 @@ class EventsJSONTest {
 		assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testPut5() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException, SQLException {
+		Request request;
 
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+
+		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"),
+				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
+		event.setOwnerEmail("email_test@gmail.com");
+		EventsAccessObject.addEvent(event);
+
+		request = new Request(Method.GET, url);
+		Response jsonResponse1 = client.handle(request);
+		Event[] events = gson.fromJson(jsonResponse1.getEntityAsText(), Event[].class);
+
+		request = new Request(Method.PUT, url);
+		request.setChallengeResponse(challengeResponse);
+		Event event_update = events[0];
+		event_update.setTitle("title_text_UPDATED");
+		request.setEntity(gson.toJson(event_update, Event.class), MediaType.APPLICATION_JSON);
+
+		DBManager.executeUpdate("drop database events_registry;");
+		Response jsonResponse = client.handle(request);
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
+		addDefaultUser();
+	}
 }

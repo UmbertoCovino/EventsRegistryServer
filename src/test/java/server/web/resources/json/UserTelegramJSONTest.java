@@ -2,6 +2,7 @@ package server.web.resources.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import commons.exceptions.ErrorCodes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,6 +23,8 @@ import commons.User;
 import server.backend.DBManager;
 import server.web.frontend.EventsRegistryWebApplication;
 
+import java.sql.SQLException;
+
 class UserTelegramJSONTest {
 
 	private static Gson gson;
@@ -34,8 +37,12 @@ class UserTelegramJSONTest {
 		gson = EventsRegistryWebApplication.GSON;
 
 		DBManager.executeUpdate("delete from users;");
-		
-		// add a user for resource with guard		
+
+		addTwoDefaultUsers();
+	}
+
+	public static void addTwoDefaultUsers(){
+		// add a user for resource with guard
 		Client client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url);
 		User user1 = new User("name_test_1", "surname_test_1", "email_test_1@gmail.com", "password_test_1", null);
@@ -117,4 +124,18 @@ class UserTelegramJSONTest {
 		assertEquals(901, jsonResponse.getStatus().getCode());
 	}
 
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testGet5() throws SQLException {
+		String email = "email_test_1@gmail.com";
+		Request request = new Request(Method.GET, url + "/" + email + "/telegram");
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test_1@gmail.com", "password_test_1");
+
+		DBManager.executeUpdate("drop database events_registry;");
+		request.setChallengeResponse(challengeResponse);
+		Response jsonResponse = client.handle(request);
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
+	}
 }

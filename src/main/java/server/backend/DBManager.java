@@ -69,4 +69,34 @@ public class DBManager {
 //		System.err.println(query); // debug
 		return DBManager.getInstance().statement.executeUpdate(query);
 	}
+
+    public static void createDB() throws SQLException {
+        executeUpdate("create database events_registry;");
+        executeUpdate("use events_registry;");
+        executeUpdate("create table users (\n" +
+                "\tname varchar(80) not null,\n" +
+                "\tsurname varchar(80) not null,\n" +
+                "\temail varchar(80) primary key,\n" +
+                "\tpassword varchar(20) not null,\n" +
+                "\tphoto_path varchar(40) not null,\n" +
+                "\tchat_id bigint(20) unsigned \n" +
+                ");");
+        executeUpdate("create table events (\n" +
+                "\tid int(8) primary key auto_increment,\n" +
+                "\ttitle varchar(80) not null,\n" +
+                "\tstart_date datetime not null,\n" +
+                "\tend_date datetime not null,\n" +
+                "\tdescription varchar(200) not null,\n" +
+                "\tphoto_path varchar(80),\n" +
+                "\tuser_owner_email varchar(80) not null,\n" +
+                "\tforeign key (user_owner_email) references users(email)\n" +
+                ");");
+        executeUpdate("create table events_users_participations (\n" +
+                "\tevent_id int(8) not null,\n" +
+                "\tuser_email varchar(80) not null,\n" +
+                "\tprimary key (event_id, user_email),\n" +
+                "\tforeign key (event_id) references events(id),\n" +
+                "\tforeign key (user_email) references users(email)\n" +
+                ");");
+    }
 }

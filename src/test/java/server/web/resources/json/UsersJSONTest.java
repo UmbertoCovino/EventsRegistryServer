@@ -1,5 +1,6 @@
 package server.web.resources.json;
 
+import commons.exceptions.ErrorCodes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +21,10 @@ import com.google.gson.Gson;
 import commons.User;
 import server.backend.DBManager;
 import server.web.frontend.EventsRegistryWebApplication;
+
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UsersJSONTest {
 
@@ -72,6 +77,19 @@ public class UsersJSONTest {
 
 		Response jsonResponse = client.handle(request);
 		Assertions.assertEquals(200, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testGet3() throws SQLException {
+		String url = "http://localhost:8182/eventsRegistry/users";
+		Client client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.GET, url);
+
+		DBManager.executeUpdate("drop database events_registry;");
+		Response jsonResponse = client.handle(request);
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
 	}
 
 	/////////////////////////////////////////POST/////////////////////////////////////////////////////
@@ -157,7 +175,25 @@ public class UsersJSONTest {
 		
 		Assertions.assertEquals(950, jsonResponse.getStatus().getCode());
 	}
-	
+
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testPost7() throws SQLException {
+		String url = "http://localhost:8182/eventsRegistry/users";
+		Client client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+
+		DBManager.executeUpdate("drop database events_registry;");
+		Response jsonResponse = client.handle(request);
+
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
+	}
+
+	///////////////////////////////////////////PUT////////////////////////////////////////////////////
+
 	@Test
 	/* update user -> post a user object, then update it  - only email parameter don't change for update */
 	public void testPut1() {
@@ -294,4 +330,26 @@ public class UsersJSONTest {
 	    Assertions.assertEquals(401, jsonResponse.getStatus().getCode());
 	}
 
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testPut8() throws SQLException {
+		String url = "http://localhost:8182/eventsRegistry/users";
+		Client client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url);
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", null);
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+		request = new Request(Method.PUT, url);
+		user = new User("name_test_UPDATE", "surname_test_UPDATE", "email_test@gmail.com", "password_test_UPDATE", null);
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		request.setChallengeResponse(challengeResponse);
+
+		DBManager.executeUpdate("drop database events_registry;");
+		Response jsonResponse = client.handle(request);
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
+	}
 }

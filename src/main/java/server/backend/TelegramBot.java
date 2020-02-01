@@ -2,6 +2,7 @@ package server.backend;
 
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ import commons.exceptions.VoidClassFieldException;
 public class TelegramBot extends TelegramLongPollingBot {
 	
 	private TelegramUsersAccessObject telegramRegistry = TelegramUsersAccessObject.instance();
-	
+
     @Override
     public void onUpdateReceived(Update update) {
 		// We check if the update has a message and the message has text
@@ -52,7 +53,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     .setText(chat_id + " - " + message_text);
             
             try {
-            	execute(message); // Sending our message object to user
+            	Message response = execute(message); // Sending our message object to user
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
@@ -74,9 +75,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         // TODO
         return "920433937:AAGzR59IS9EZubWqx0ectFjh2tbfIkK8hzQ";
     }
-    
+
     class Notification extends Thread {
-    	
+
+    	private int timeout = 60000;
+
     	public void run() {
     		try {
     			while (!this.isInterrupted()) {
@@ -109,7 +112,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 						}
     				}
     				
-    				Thread.sleep((long)60000);
+    				Thread.sleep((long)timeout);
     			}
     		} catch (Exception e) {
     			e.printStackTrace();

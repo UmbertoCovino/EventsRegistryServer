@@ -2,6 +2,7 @@ package server.web.resources.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import commons.exceptions.ErrorCodes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,6 +22,8 @@ import com.google.gson.Gson;
 import commons.User;
 import server.backend.DBManager;
 import server.web.frontend.EventsRegistryWebApplication;
+
+import java.sql.SQLException;
 
 class UserJSONTest {
 
@@ -102,6 +105,24 @@ class UserJSONTest {
 
 		assertEquals(950, jsonResponse.getStatus().getCode());
 	}
+
+	@Test
+	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void testGet4() throws SQLException {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+
+		DBManager.executeUpdate("drop database events_registry;");
+		request = new Request(Method.GET, url + user.getEmail());
+		Response jsonResponse =  client.handle(request);
+
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
+	}
 	
 	///////////////////////////////////////////POST//////////////////////////////////////////////////////
 	
@@ -165,5 +186,26 @@ class UserJSONTest {
 		Response jsonResponse = client.handle(request);
 
 		assertEquals(901, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* authorized user (email_logged_user equals USER_email_passed)
+		but delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
+	public void delete4() throws SQLException {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+
+		DBManager.executeUpdate("drop database events_registry;");
+		request = new Request(Method.DELETE, url + "email_test@gmail.com");
+		request.setChallengeResponse(challengeResponse);
+		Response jsonResponse = client.handle(request);
+		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
+		DBManager.createDB();
 	}
 }

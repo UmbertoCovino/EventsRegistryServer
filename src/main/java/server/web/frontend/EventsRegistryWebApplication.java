@@ -104,7 +104,7 @@ public class EventsRegistryWebApplication extends Application {
 			       );
 		}
 	}
-		
+
     /**
      * Creates a root Restlet that will receive all incoming calls.
      */
@@ -118,7 +118,7 @@ public class EventsRegistryWebApplication extends Application {
 		webStaticFilesDirectory.setDeeplyAccessible(true);
 		
 		verifier = new MapVerifier();
-		
+
 		try {
 			for (String email : UsersAccessObject.getUsersEmails())
 				verifier.getLocalSecrets().put(email, UsersAccessObject.getUserPassword(email).toCharArray());
@@ -131,7 +131,7 @@ public class EventsRegistryWebApplication extends Application {
 		}
 			
 		getContext().setDefaultVerifier(verifier);
-		
+
 		router.attach("/eventsRegistry/web", webStaticFilesDirectory);
 		router.attach("/eventsRegistry/web/", webStaticFilesDirectory);
 		

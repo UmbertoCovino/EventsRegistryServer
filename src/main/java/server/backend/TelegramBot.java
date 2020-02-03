@@ -1,11 +1,11 @@
 package server.backend;
 
 
+import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,6 +18,7 @@ import commons.User;
 import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidUserEmailException;
 import commons.exceptions.VoidClassFieldException;
+
 /*
  * deep-linking telegram
  * https://telegram.me/EventsAppBot?/start=<token> the bot will receive a start string with payload (in our app the user's id)
@@ -25,15 +26,16 @@ import commons.exceptions.VoidClassFieldException;
 public class TelegramBot extends TelegramLongPollingBot {
 	
 	private TelegramUsersAccessObject telegramRegistry = TelegramUsersAccessObject.instance();
+	private Message last_response; //to test what the bot send to user
 
-    @Override
+	@Override
     public void onUpdateReceived(Update update) {
 		// We check if the update has a message and the message has text
         if (update.hasMessage() && update.getMessage().hasText()) {
 
         	String message_text = update.getMessage().getText();
             long chat_id = update.getMessage().getChatId();
-            
+            System.out.println("telegramBot: " + update.getMessage().getText());
             if(message_text.contains("start")) {
             	
                 String tokenS = message_text.substring(7);
@@ -53,12 +55,18 @@ public class TelegramBot extends TelegramLongPollingBot {
                     .setText(chat_id + " - " + message_text);
             
             try {
-            	Message response = execute(message); // Sending our message object to user
+				last_response = execute(message); // Sending our message object to user
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
         }
     }
+
+    public Message onUpdateReceivedCaller(Update update){
+		this.last_response = null;
+    	this.onUpdateReceived(update);
+    	return last_response;
+	}
     
     public void startNotificationManager() {
     	new Notification().start();

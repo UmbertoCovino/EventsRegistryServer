@@ -31,8 +31,8 @@ import java.text.ParseException;
 
 class EventSubscribersJSONTest {
 
-	private static Gson gson;
 	private static String url = "http://localhost:8182/eventsRegistry/events";
+	private static Gson gson;
 	private static Client client;
 	private static int eventId;
 

@@ -82,8 +82,9 @@ public class EventsJSON extends ServerResource {
 		} catch (GenericSQLException e) {
 			Status status = new Status(ErrorCodes.GENERIC_SQL);
 			setStatus(status);
-			
+
 			return gson.toJson(e, GenericSQLException.class);
+
 		}
     }
     

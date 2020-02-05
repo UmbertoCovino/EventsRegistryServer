@@ -71,36 +71,36 @@ public class UsersAccessObject {
 		return user;
 	}
 	
-//	public synchronized static User getUserWithPassword(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
-//		User user = null;
-//
-//		if (email == null || email.equals(""))
-//			throw new VoidClassFieldException("The email passed cannot be null or empty.");
-//		else if (email.length() > 80)
-//			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
-//		else if (!isEmailValid(email))
-//			throw new VoidClassFieldException("The email passed is not valid.");
-//
-//		try {
-//			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
-//
-//			if (rs.next()) {
-//				String name = rs.getString("name");
-//				String surname = rs.getString("surname");
-//				String password = rs.getString("password");
-//				String photoPath = rs.getString("photo_path");
-//
-//				user = new User(name, surname, email, password, photoPath);
-//			} else
-//				throw new InvalidUserEmailException("Inexistent user email: " + email);
-//
-//			rs.close();
-//		} catch (SQLException e) {
-//			throw new GenericSQLException(e.getMessage());
-//		}
-//
-//		return user;
-//	}
+	public synchronized static User getUserWithPassword(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
+		User user = null;
+
+		if (email == null || email.equals(""))
+			throw new VoidClassFieldException("The email passed cannot be null or empty.");
+		else if (email.length() > 80)
+			throw new VoidClassFieldException("The email passed cannot be over 80 chars.");
+		else if (!isEmailValid(email))
+			throw new VoidClassFieldException("The email passed is not valid.");
+
+		try {
+			ResultSet rs = DBManager.executeQuery("select * from users where email = '" + email + "';");
+
+			if (rs.next()) {
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String password = rs.getString("password");
+				String photoPath = rs.getString("photo_path");
+
+				user = new User(name, surname, email, password, photoPath);
+			} else
+				throw new InvalidUserEmailException("Inexistent user email: " + email);
+
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+
+		return user;
+	}
 	
 //	public synchronized static String getUserName(String email) throws InvalidUserEmailException, GenericSQLException, VoidClassFieldException {
 //		String name = null;

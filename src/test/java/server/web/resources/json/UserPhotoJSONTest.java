@@ -8,12 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -23,6 +18,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.representation.FileRepresentation;
+import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 
 import com.google.gson.Gson;
@@ -32,6 +28,7 @@ import server.backend.DBManager;
 import server.backend.UsersAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
+@TestMethodOrder(MethodOrderer.Alphanumeric.class)
 class UserPhotoJSONTest {
 
 	private Client client = new Client(Protocol.HTTP);
@@ -144,7 +141,7 @@ class UserPhotoJSONTest {
 
 		Assertions.assertEquals(200, response.getStatus().getCode());
 	}
-
+	
 	@Test
 	/* set a MediaType different of JPEG ---> 415 Unsupported Media Type */
 	public void put2() throws ResourceException, IOException {

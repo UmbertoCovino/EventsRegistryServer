@@ -141,7 +141,7 @@ class UserPhotoJSONTest {
 
 		Assertions.assertEquals(200, response.getStatus().getCode());
 	}
-	
+
 	@Test
 	/* set a MediaType different of JPEG ---> 415 Unsupported Media Type */
 	public void put2() throws ResourceException, IOException {
@@ -151,7 +151,7 @@ class UserPhotoJSONTest {
 		File new_source = new File(email1 + ".jpg");
 		Request request = new Request(Method.PUT, URI);
 		FileRepresentation payload = new FileRepresentation(source,
-				MediaType.IMAGE_PNG);
+				MediaType.IMAGE_GIF);
 		request.setEntity(payload);
 		request.setChallengeResponse(challengeResponse);
 		Response response = client.handle(request);

@@ -1,13 +1,11 @@
 package server.web.resources.json;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
 import org.restlet.data.Status;
-import org.restlet.resource.Get;
-import org.restlet.resource.Post;
-import org.restlet.resource.Put;
-import org.restlet.resource.ServerResource;
+import org.restlet.resource.*;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -20,6 +18,7 @@ import commons.exceptions.InvalidUserEmailException;
 import commons.exceptions.JsonParsingException;
 import commons.exceptions.UnauthorizedUserException;
 import commons.exceptions.VoidClassFieldException;
+import server.backend.DBManager;
 import server.backend.EventsAccessObject;
 import server.web.frontend.EventsRegistryWebApplication;
 
@@ -138,11 +137,34 @@ public class EventsJSON extends ServerResource {
 			return gson.toJson(e, InvalidUserEmailException.class);
 		} 
     }
-    
-//    @Delete("json")
-//    public String deleteAll() {
-//		//to be implemented
-//		
-//		return null;
-//    }
+
+    @Delete("json")
+    public synchronized String deleteAll() throws SQLException {
+		// this is used only for test scope
+		//to be implemented the version that preserve sql exception linked with the primary key eventId
+		Gson gson = EventsRegistryWebApplication.GSON;
+		try {
+			ArrayList<Event> events = null;
+			events = EventsAccessObject.getEvents();
+			for(Event e: events){
+				EventsAccessObject.removeEvent(e.getId());
+			}
+			return gson.toJson(true, boolean.class);
+		} catch (GenericSQLException e) {
+			Status status = new Status(ErrorCodes.GENERIC_SQL);
+			setStatus(status);
+
+			return gson.toJson(e, GenericSQLException.class);
+		} catch (InvalidEventIdException e) {
+			Status status = new Status(ErrorCodes.INVALID_EVENT_ID);
+			setStatus(status);
+
+			return gson.toJson(e, InvalidEventIdException.class);
+		} catch (VoidClassFieldException e) {
+			Status status = new Status(ErrorCodes.VOID_CLASS_FIELD);
+			setStatus(status);
+
+			return gson.toJson(e, VoidClassFieldException.class);
+		}
+    }
 }

@@ -38,43 +38,43 @@ public class EventsAccessObject {
 //		return eventsNumber;
 //	}
 	
-//	public synchronized static Event getEvent(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
-//		Event event = null;
-//
-//		if (id < 0)
-//			throw new VoidClassFieldException("The id passed cannot be < 0.");
-//
-//		try {
-//			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
-//											   + "from events E join users U on user_owner_email = email "
-//											   + "where id = " + id + ";");
-//
-//			if (rs.next()) {
-//				String title = rs.getString("title");
-//				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
-//				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
-//				String description = rs.getString("description");
-//				String photoPath = rs.getString("e_photo_path");
-//				String ownerEmail = rs.getString("user_owner_email");
-//
-//				String name = rs.getString("name");
-//				String surname = rs.getString("surname");
-//				String email = rs.getString("email");
-//				String userPhotoPath = rs.getString("u_photo_path");
-//
-//				User owner = new User(name, surname, email, userPhotoPath);
-//
-//				event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, owner);
-//			} else
-//				throw new InvalidEventIdException("Inexistent event id: " + id);
-//
-//			rs.close();
-//		} catch (SQLException e) {
-//			throw new GenericSQLException(e.getMessage());
-//		}
-//
-//		return event;
-//	}
+	public synchronized static Event getEvent(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
+		Event event = null;
+
+		if (id < 0)
+			throw new VoidClassFieldException("The id passed cannot be < 0.");
+
+		try {
+			ResultSet rs = DBManager.executeQuery("select title, start_date, end_date, description, E.photo_path as e_photo_path, user_owner_email, name, surname, email, U.photo_path as u_photo_path "
+											   + "from events E join users U on user_owner_email = email "
+											   + "where id = " + id + ";");
+
+			if (rs.next()) {
+				String title = rs.getString("title");
+				Date startDate = new Date(rs.getTimestamp("start_date").getTime());
+				Date endDate = new Date(rs.getTimestamp("end_date").getTime());
+				String description = rs.getString("description");
+				String photoPath = rs.getString("e_photo_path");
+				String ownerEmail = rs.getString("user_owner_email");
+
+				String name = rs.getString("name");
+				String surname = rs.getString("surname");
+				String email = rs.getString("email");
+				String userPhotoPath = rs.getString("u_photo_path");
+
+				User owner = new User(name, surname, email, userPhotoPath);
+
+				event = new Event(id, title, startDate, endDate, description, photoPath, ownerEmail, owner);
+			} else
+				throw new InvalidEventIdException("Inexistent event id: " + id);
+
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+
+		return event;
+	}
 	
 //	public synchronized static String getEventTitle(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
 //		String title = null;
@@ -208,35 +208,35 @@ public class EventsAccessObject {
 		return ownerEmail;
 	}
 
-//	public synchronized static User getEventOwner(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
-//		User owner = null;
-//
-//		if (id < 0)
-//			throw new VoidClassFieldException("The id passed cannot be < 0.");
-//
-//		try {
-//			ResultSet rs = DBManager.executeQuery("select user_owner_email from events where id = " + id + ";");
-//
-//			if (rs.next()) {
-//				String ownerEmail = rs.getString("user_owner_email");
-//
-//				try {
-//					owner = UsersAccessObject.getUser(ownerEmail);
-//				} catch (InvalidUserEmailException e) {
-//					owner = null;
-//				} catch (VoidClassFieldException e) {
-//					owner = null;
-//				}
-//			} else
-//				throw new InvalidEventIdException("Inexistent event id: " + id);
-//
-//			rs.close();
-//		} catch (SQLException e) {
-//			throw new GenericSQLException(e.getMessage());
-//		}
-//
-//		return owner;
-//	}
+	public synchronized static User getEventOwner(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
+		User owner = null;
+
+		if (id < 0)
+			throw new VoidClassFieldException("The id passed cannot be < 0.");
+
+		try {
+			ResultSet rs = DBManager.executeQuery("select user_owner_email from events where id = " + id + ";");
+
+			if (rs.next()) {
+				String ownerEmail = rs.getString("user_owner_email");
+
+				try {
+					owner = UsersAccessObject.getUser(ownerEmail);
+				} catch (InvalidUserEmailException e) {
+					owner = null;
+				} catch (VoidClassFieldException e) {
+					owner = null;
+				}
+			} else
+				throw new InvalidEventIdException("Inexistent event id: " + id);
+
+			rs.close();
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+
+		return owner;
+	}
 	
 	public synchronized static ArrayList<User> getEventSubscribers(int id) throws GenericSQLException, InvalidEventIdException, VoidClassFieldException {
 		ArrayList<User> users = new ArrayList<>();
@@ -821,33 +821,33 @@ public class EventsAccessObject {
 
 	// REMOVERS ----------------------------------------------------------------------------------------------
 	
-//	public synchronized static int removeEvent(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
-//		int result = 0;
-//
-//		if (id < 0)
-//			throw new VoidClassFieldException("The id passed cannot be < 0.");
-//
-//		try {
-//			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
-//
-//			if (rs.next()) {
-//				if (rs.getInt("events_number") == 0)
-//					throw new InvalidEventIdException("Inexistent event id: " + id);
-//
-//
-//
-//				result = DBManager.executeUpdate("delete from events "
-//						                       + "where id = '" + id + "';");
-//			}
-//		} catch (SQLException e) {
-//			throw new GenericSQLException(e.getMessage());
-//		}
-//
-//		if (result == 1)
-//			return 1;
-//		else
-//			throw new GenericSQLException("An error occurred while removing event in DB.");
-//	}
+	public synchronized static int removeEvent(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
+		int result = 0;
+
+		if (id < 0)
+			throw new VoidClassFieldException("The id passed cannot be < 0.");
+
+		try {
+			ResultSet rs = DBManager.executeQuery("select count(*) as events_number from events where id = " + id + ";");
+
+			if (rs.next()) {
+				if (rs.getInt("events_number") == 0)
+					throw new InvalidEventIdException("Inexistent event id: " + id);
+
+
+
+				result = DBManager.executeUpdate("delete from events "
+						                       + "where id = '" + id + "';");
+			}
+		} catch (SQLException e) {
+			throw new GenericSQLException(e.getMessage());
+		}
+
+		if (result == 1)
+			return 1;
+		else
+			throw new GenericSQLException("An error occurred while removing event in DB.");
+	}
 
 	public synchronized static int removeEventSubscriber(int id, String email) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException, InvalidUserEmailException, InvalidParticipationException {
 		int result = 0;

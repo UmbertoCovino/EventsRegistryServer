@@ -41,25 +41,17 @@ import server.backend.DBManager;
 import server.backend.TelegramBot;
 import server.backend.UsersAccessObject;
 //import server.web.resources.json.EventJSON;
-import server.web.resources.json.EventPhotoJSON;
+import server.web.resources.json.*;
 //import server.web.resources.json.EventStartDateJSON;
-import server.web.resources.json.EventSubscribersJSON;
 //import server.web.resources.json.EventDescriptionJSON;
 //import server.web.resources.json.EventEndDateJSON;
 //import server.web.resources.json.EventTitleJSON;
 //import server.web.resources.json.EventUserOwnerJSON;
-import server.web.resources.json.EventsAfterDateJSON;
-import server.web.resources.json.EventsBeforeDateJSON;
-import server.web.resources.json.EventsJSON;
-import server.web.resources.json.EventsFromDateToDateJSON;
 //import server.web.resources.json.UserEventsJSON;
-import server.web.resources.json.UserJSON;
 //import server.web.resources.json.UserNameJSON;
 //import server.web.resources.json.UserPasswordJSON;
-import server.web.resources.json.UserPhotoJSON;
 //import server.web.resources.json.UserSurnameJSON;
-import server.web.resources.json.UserTelegramJSON;
-import server.web.resources.json.UsersJSON;
+
 //import server.web.resources.json.UsersSizeJSON;
 
 public class EventsRegistryWebApplication extends Application {
@@ -140,7 +132,7 @@ public class EventsRegistryWebApplication extends Application {
 		router.attach("/eventsRegistry/events/after/{date}", EventsAfterDateJSON.class);
 		router.attach("/eventsRegistry/events/before/{date}", EventsBeforeDateJSON.class);
 		router.attach("/eventsRegistry/events/between/{from}/{to}", EventsFromDateToDateJSON.class);
-		//router.attach("/eventsRegistry/events/{id}", getGuardExcludingGet(EventJSON.class));						// not used
+		router.attach("/eventsRegistry/events/{id}", getGuardExcludingGet(EventJSON.class));						// not used
 		//router.attach("/eventsRegistry/events/{id}/title", getGuardExcludingGet(EventTitleJSON.class));				// not used
 		//router.attach("/eventsRegistry/events/{id}/startDate", getGuardExcludingGet(EventStartDateJSON.class));		// not used
 		//router.attach("/eventsRegistry/events/{id}/endDate", getGuardExcludingGet(EventEndDateJSON.class));			// not used

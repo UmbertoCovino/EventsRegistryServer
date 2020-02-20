@@ -141,7 +141,7 @@ public class EventsJSON extends ServerResource {
     @Delete("json")
     public synchronized String deleteAll() throws SQLException {
 		// this is used only for test scope
-		//to be implemented the version that preserve sql exception linked with the primary key eventId
+		//to implement the version that preserve sql exception linked with the primary key eventId
 		Gson gson = EventsRegistryWebApplication.GSON;
 		try {
 			ArrayList<Event> events = null;

@@ -34,7 +34,7 @@ public class EventPhotoJSON extends ServerResource {
 		try {
     			int id = Integer.valueOf(getAttribute("id"));
 			String photoPath = EventsAccessObject.getEventPhotoPath(id);
-			
+
 			Path path = Paths.get(EventsRegistryWebApplication.EVENTS_PHOTOS_DIRECTORY + photoPath);
 			
 			if (!new File(path.toString()).exists())
@@ -72,7 +72,7 @@ public class EventPhotoJSON extends ServerResource {
     public String updatePhoto(Representation entity) throws ResourceException {
 		Gson gson = EventsRegistryWebApplication.GSON;
 		int id = Integer.valueOf(getAttribute("id"));
-		
+
 		try {
 			String ownerEmail = EventsAccessObject.getEventOwnerEmail(id);
 			
@@ -86,7 +86,7 @@ public class EventPhotoJSON extends ServerResource {
 			} catch (Exception e) {
 				Status status = new Status(ErrorCodes.RESOURCE_EXCEPTION);
 				setStatus(status);
-				
+
 				return gson.toJson(new ResourceException(e), ResourceException.class);
 //				throw new ResourceException(e);
 			}

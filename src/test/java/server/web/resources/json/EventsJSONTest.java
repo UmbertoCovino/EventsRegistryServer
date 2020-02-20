@@ -343,4 +343,29 @@ class EventsJSONTest {
 		DBManager.createDB();
 		addDefaultUser();
 	}
+
+	/////////////////////////////////////////DELETE//////////////////////////////////////////////////
+
+	@Test
+	/* DELETE ALL EVENTS: 200 OK*/
+	public void delete1() throws ParseException {
+		Request request = new Request(Method.POST, url);
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+		Event event1 = new Event("title_test_1", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"),
+				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
+		request.setChallengeResponse(challengeResponse);
+		request.setEntity(gson.toJson(event1, Event.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+		Event event2 = new Event("title_test_2", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"),
+				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
+		request.setEntity(gson.toJson(event2, Event.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+
+		request = new Request(Method.DELETE, url);
+		request.setChallengeResponse(challengeResponse);
+		Response jsonResponse = client.handle(request);
+
+		assertEquals(200, jsonResponse.getStatus().getCode());
+	}
 }

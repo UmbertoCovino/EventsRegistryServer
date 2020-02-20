@@ -2,6 +2,7 @@ package server.web.resources.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import commons.Event;
 import commons.exceptions.ErrorCodes;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -27,18 +28,21 @@ import java.sql.SQLException;
 
 class UserJSONTest {
 
-	private static Gson gson = new Gson();
+	private static Gson gson = EventsRegistryWebApplication.GSON;
 	private static Client client;
 	private static String url = "http://localhost:8182/eventsRegistry/users/";
 	private static User user;
 
 	@BeforeAll
-	public static void setUpBeforeAll() throws Exception {				
+	public static void setUpBeforeAll() throws Exception {
 		LaunchServerApp.execute();
 	}
 	
 	@AfterAll
 	public static void tearDownAfterClass() throws Exception {
+		DBManager.executeUpdate("delete from events_users_participations;");
+		DBManager.executeUpdate("delete from events;");
+		DBManager.executeUpdate("delete from users;");
 	}
 	
 	@BeforeEach
@@ -128,6 +132,62 @@ class UserJSONTest {
 	
 	// non mi è chiara la funzione del POST nella resource class UserJson 
 	// va rivisto questo metodo: getIfPasswordIsCorrect, eventualmente potrebbe essere usata la guard ed evitare la verifica
+
+	@Test
+	/* post della password e restituzione di un oggetto User senza password
+	*  */
+	public void testPost1() {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+
+		request = new Request(Method.POST, url + user.getEmail());
+		request.setEntity(gson.toJson("password_test", String.class), MediaType.APPLICATION_JSON);
+		Response jsonResponse =  client.handle(request);
+
+		User user = new User("name_test", "surname_test", "email_test@gmail.com", "email_test@gmail.com.jpg");
+
+		assertEquals(user.getEmail(), "email_test@gmail.com");
+	}
+
+	@Test
+	/* post della password e restituzione di un oggetto User senza password
+	 *  INVALID USER EMAIL*/
+	public void testPost2() {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+
+		request = new Request(Method.POST, url + "INVALID_email_test@gmail.com");
+		request.setEntity(gson.toJson("password_test", String.class), MediaType.APPLICATION_JSON);
+		Response jsonResponse =  client.handle(request);
+
+		assertEquals(ErrorCodes.INVALID_USER_EMAIL, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* post della password e restituzione di un oggetto User senza password
+	 *  404 invalid password payload*/
+	public void testPost3() {
+		String url_users = "http://localhost:8182/eventsRegistry/users";
+		client = new Client(Protocol.HTTP);
+		Request request = new Request(Method.POST, url_users);
+		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
+		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+		client.handle(request);
+
+		request = new Request(Method.POST, url + user.getEmail());
+		request.setEntity(gson.toJson("INVALID_password_test", String.class), MediaType.APPLICATION_JSON);
+		Response jsonResponse =  client.handle(request);
+
+		assertEquals(404 ,jsonResponse.getStatus().getCode());
+	}
 	
 	//////////////////////////////////////////DELETE////////////////////////////////////////////////////
 	

@@ -4,7 +4,7 @@ services:
   - mysql
 
 before_install:
-  - mysql -u root < ./events_registry.sql
+#  - mysql -u root < ./events_registry.sql
 
 script: mvn clean compile package
    

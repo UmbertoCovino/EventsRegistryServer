@@ -195,7 +195,7 @@
 				<!-- common configuration shared by all executions -->
 				<configuration>
 					<driver>com.mysql.jdbc.Driver</driver>
-					<url>jdbc:mysql://localhost:3306/events_registry</url>
+					<url>jdbc:mysql://localhost:3306/</url>
 					<username>root</username>
 					<password></password>
 				</configuration>

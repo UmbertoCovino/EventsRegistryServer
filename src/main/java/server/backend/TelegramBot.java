@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -99,7 +100,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     				Date tomorrow = c.getTime();
     				
     				ArrayList<Event> events = EventsAccessObject.getEventsBetweenTwoDates(today, tomorrow);
-    				System.out.println("notification thread");
+    				System.out.println("Notification thread (" + (new SimpleDateFormat("HH:mm:ss")).format(new Date()) + ")");
     				for(Event event: events) {
     					// notifica tutti gli utenti che sono interessati ad eventi che si terranno in giornata
     					System.out.println(event.getTitle());

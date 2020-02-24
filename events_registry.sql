@@ -28,6 +28,7 @@ create table if not exists events_users_participations (
 	event_id int(8) not null,
 	user_email varchar(80) not null,
 	primary key (event_id, user_email),
-	foreign key (event_id) references events(id),
-	foreign key (user_email) references users(email)
+	foreign key (event_id) references events(id) on update cascade on delete cascade,
+	foreign key (user_email) references users(email) on update cascade on delete cascade
 );
+

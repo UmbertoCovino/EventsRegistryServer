@@ -29,6 +29,7 @@ class EventPhotoPutJSONTest {
     private static int eventId_1;
     private static File source = new File("email_test@gmail.com.jpg");
     private static String email = "email_test@gmail.com";
+    private static String email2 = "email2_test@gmail.com";
     private static String password = "password_test";
 
     @BeforeAll
@@ -53,6 +54,9 @@ class EventPhotoPutJSONTest {
         String url_users = "http://localhost:8182/eventsRegistry/users";
         Request request = new Request(Method.POST, url_users);
         User user = new User("name_test", "surname_test", email, password, "email_test.jpg");
+        request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
+        client.handle(request);
+        user = new User("name_test", "surname_test", email2, password, "email_test.jpg");
         request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
         client.handle(request);
 
@@ -111,6 +115,22 @@ class EventPhotoPutJSONTest {
     public void put2() throws ResourceException, IOException {
         ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
                 email, password);
+        String URI = url  + "/" + eventId_1 + "/photo";
+        Request request = new Request(Method.PUT, URI);
+        FileRepresentation payload = new FileRepresentation(source,
+                MediaType.IMAGE_GIF);
+        request.setEntity(payload);
+        request.setChallengeResponse(challengeResponse);
+        Response response = client.handle(request);
+
+        Assertions.assertEquals(415, response.getStatus().getCode());
+    }
+
+    @Test
+    /* user passed with guard -> emailUserPassed != ownerEventEmail ---> UNAUTHORIZED_USER = 901*/
+    public void put3() throws ResourceException, IOException {
+        ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+                email2, password);
         String URI = url  + "/" + eventId_1 + "/photo";
         Request request = new Request(Method.PUT, URI);
         FileRepresentation payload = new FileRepresentation(source,

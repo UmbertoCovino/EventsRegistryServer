@@ -29,8 +29,9 @@ import java.sql.SQLException;
 class UserJSONTest {
 
 	private static Gson gson = EventsRegistryWebApplication.GSON;
-	private static Client client;
+	private static String url_users = "http://localhost:8182/eventsRegistry/users";
 	private static String url = "http://localhost:8182/eventsRegistry/users/";
+	private static Client client = new Client(Protocol.HTTP);
 	private static User user;
 
 	@BeforeAll
@@ -59,8 +60,6 @@ class UserJSONTest {
 	/* non manca una guard? E' possibile ottenere un oggetto User solo grazie alla email? 
 	 * Sì perché mi restituisce un oggetto User senza password */
 	public void testGet1() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -80,8 +79,6 @@ class UserJSONTest {
 	@Test
 	/* wrong parameter: invalid attribute email ---> INVALID_USER_EMAIL = 900 */
 	public void testGet2() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -96,8 +93,6 @@ class UserJSONTest {
 	@Test
 	/* VOID_CLASS_FIELD = 950 */
 	public void testGet3() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com",
 				"password_test", "email_test.jpg");
@@ -113,8 +108,6 @@ class UserJSONTest {
 	@Test
 	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
 	public void testGet4() throws SQLException {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -137,8 +130,6 @@ class UserJSONTest {
 	/* post della password e restituzione di un oggetto User senza password
 	*  */
 	public void testPost1() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -156,9 +147,7 @@ class UserJSONTest {
 	@Test
 	/* post della password e restituzione di un oggetto User senza password
 	 *  INVALID USER EMAIL*/
-	public void testPost2() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
+	public void testPost2() { ;
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -175,8 +164,6 @@ class UserJSONTest {
 	/* post della password e restituzione di un oggetto User senza password
 	 *  404 invalid password payload*/
 	public void testPost3() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -194,8 +181,6 @@ class UserJSONTest {
 	@Test
 	/* authorized user (email_logged_user equals USER_email_passed) ---> 200 OK */
 	public void delete1() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -213,8 +198,6 @@ class UserJSONTest {
 	@Test
 	/* UNAUTHORIZED_USER = 901 */
 	public void delete2() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -232,8 +215,6 @@ class UserJSONTest {
 	@Test
 	/* UNAUTHORIZED_USER = 901 */
 	public void delete3() {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);
@@ -252,8 +233,6 @@ class UserJSONTest {
 	/* authorized user (email_logged_user equals USER_email_passed)
 		but delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
 	public void delete4() throws SQLException {
-		String url_users = "http://localhost:8182/eventsRegistry/users";
-		client = new Client(Protocol.HTTP);
 		Request request = new Request(Method.POST, url_users);
 		user = new User("name_test", "surname_test", "email_test@gmail.com", "password_test", "email_test.jpg");
 		request.setEntity(gson.toJson(user, User.class), MediaType.APPLICATION_JSON);

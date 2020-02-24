@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.function.Function;
 
 import commons.exceptions.ErrorCodes;
 import commons.exceptions.GenericSQLException;
@@ -104,34 +105,35 @@ class EventsJSONTest {
 	}
 
 	/////////////////////////////////////////////POST///////////////////////////////////////////////
-	
+
+	/* utility method */
+	public Response addEventToServer(Date startDate, Date endDate, String tile, String description){
+		Request request = new Request(Method.POST, url);
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				"email_test@gmail.com", "password_test");
+		Event event = new Event(tile, startDate, endDate, description);
+		request.setChallengeResponse(challengeResponse);
+		request.setEntity(gson.toJson(event, Event.class), MediaType.APPLICATION_JSON);
+		Response jsonResponse = client.handle(request);
+		return jsonResponse;
+	}
+
 	@Test
 	/* all parameter are valid 200 OK */
 	public void testPost1() throws ParseException {
-		Request request = new Request(Method.POST, url);
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test@gmail.com", "password_test");
-		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"), 
-				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");		
-		request.setChallengeResponse(challengeResponse);	
-		request.setEntity(gson.toJson(event, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Date startDate = Event.DATETIME_SDF.parse("2020-01-18 19:26:00");
+		Date endDate = Event.DATETIME_SDF.parse("2020-01-24 10:26:00");
+		Response jsonResponse = addEventToServer(startDate, endDate, "title_test", "description_test");
 
 		assertEquals(200, jsonResponse.getStatus().getCode());
 	}
-	
+
 	@Test
 	/* title parameter empty space ---> VOID_CLASS_FIELD = 950 */
 	public void testPost2() throws ParseException {
-		Request request = new Request(Method.POST, url);
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test@gmail.com", "password_test");
 		Date startDate = Event.DATETIME_SDF.parse("2020-01-15 19:26:00");
-		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00"); 
-		Event event = new Event("", startDate, endDate, "description_test");
-		request.setChallengeResponse(challengeResponse);	
-		request.setEntity(gson.toJson(event, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00");
+		Response jsonResponse = addEventToServer(startDate, endDate, "", "description_test");
 
 		assertEquals(950, jsonResponse.getStatus().getCode());
 	}
@@ -139,15 +141,9 @@ class EventsJSONTest {
 	@Test
 	/* startDate parameter null ---> VOID_CLASS_FIELD = 950 */
 	public void testPost3() throws ParseException {
-		Request request = new Request(Method.POST, url);
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test@gmail.com", "password_test");
 		Date startDate = null;
-		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00"); 
-		Event event = new Event("title_test", startDate, endDate, "description_test");
-		request.setChallengeResponse(challengeResponse);	
-		request.setEntity(gson.toJson(event, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00");
+		Response jsonResponse = addEventToServer(startDate, endDate, "title_test", "description_test");
 
 		assertEquals(950, jsonResponse.getStatus().getCode());
 	}
@@ -155,15 +151,9 @@ class EventsJSONTest {
 	@Test
 	/* endDate parameter null ---> VOID_CLASS_FIELD = 950 */
 	public void testPost4() throws ParseException {
-		Request request = new Request(Method.POST, url);
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test@gmail.com", "password_test");
 		Date startDate = Event.DATETIME_SDF.parse("2020-01-15 19:26:00");
-		Date endDate = null; 
-		Event event = new Event("title_test", startDate, endDate, "description_test");
-		request.setChallengeResponse(challengeResponse);	
-		request.setEntity(gson.toJson(event, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Date endDate = null;
+		Response jsonResponse = addEventToServer(startDate, endDate, "title_test", "description_test");
 
 		assertEquals(950, jsonResponse.getStatus().getCode());
 	}
@@ -171,22 +161,62 @@ class EventsJSONTest {
 	@Test
 	/* description parameter empty space ---> VOID_CLASS_FIELD = 950 */
 	public void testPost5() throws ParseException {
-		Request request = new Request(Method.POST, url);
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
-				"email_test@gmail.com", "password_test");
 		Date startDate = Event.DATETIME_SDF.parse("2020-01-15 19:26:00");
 		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00");
-		Event event = new Event("title_test", startDate, endDate, "");
-		request.setChallengeResponse(challengeResponse);
-		request.setEntity(gson.toJson(event, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Response jsonResponse = addEventToServer(startDate, endDate, "title_test", "");
+
+		assertEquals(950, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* NUll title parameter ---> VOID_CLASS_FIELD = 950 */
+	public void testPost6() throws ParseException {
+		Date startDate = Event.DATETIME_SDF.parse("2020-01-15 19:26:00");
+		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00");
+		Response jsonResponse = addEventToServer(startDate, endDate, null, "description_test");
+
+		assertEquals(950, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* title length > 80 ---> VOID_CLASS_FIELD = 950 */
+	public void testPost7() throws ParseException {
+		Date startDate = Event.DATETIME_SDF.parse("2020-01-15 19:26:00");
+		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00");
+		Response jsonResponse = addEventToServer(startDate, endDate,
+				"the_title_passed_is_greater_than_eighty_characters_the_title_passed_is_greater_than_eighty_characters",
+				"description_test");
+
+		assertEquals(950, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* description length > 200 ---> VOID_CLASS_FIELD = 950 */
+	public void testPost8() throws ParseException {
+		Date startDate = Event.DATETIME_SDF.parse("2020-01-15 19:26:00");
+		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00");
+		Response jsonResponse = addEventToServer(startDate, endDate, "title_test",
+				"description_passed_over_200_characters_description_passed_over_200_characters_description_passed_over_200_characters" +
+						"_description_passed_over_200_characters_description_passed_over_200_characters_description_passed_over_200_characters" +
+						"_description_passed_over_200_characters_description_passed_over_200_characters_description_passed_over_200_characters");
+
+		assertEquals(950, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* description length > 200 ---> VOID_CLASS_FIELD = 950 */
+	public void testPost9() throws ParseException {
+		Date startDate = Event.DATETIME_SDF.parse("2020-01-15 19:26:00");
+		Date endDate = Event.DATETIME_SDF.parse("2020-01-16 10:26:00");
+		Response jsonResponse = addEventToServer(startDate, endDate, "title_test",
+				null);
 
 		assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 
 	@Test
 	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
-	public void testPost6() throws ParseException, SQLException {
+	public void testPost20() throws ParseException, SQLException {
 		Request request = new Request(Method.POST, url);
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
 				"email_test@gmail.com", "password_test");
@@ -204,29 +234,54 @@ class EventsJSONTest {
 
 	/////////////////////////////////////////////PUT///////////////////////////////////////////////
 
-	@Test
-	/* update event: all parameters are valid  ---> 200 OK */
-	public void testPut1() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+	/* */
+	public Response updateEventToServer(Function<Event, Event> eventModification) throws InvalidEventIdException, VoidClassFieldException, GenericSQLException, ParseException {
 		Request request;
-						
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
+
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
 				"email_test@gmail.com", "password_test");
-		
-		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"), 
+
+		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"),
 				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
 		event.setOwnerEmail("email_test@gmail.com");
 		EventsAccessObject.addEvent(event);
-		
+
 		request = new Request(Method.GET, url);
 		Response jsonResponse1 = client.handle(request);
 		Event[] events = gson.fromJson(jsonResponse1.getEntityAsText(), Event[].class);
-		
 		request = new Request(Method.PUT, url);
 		request.setChallengeResponse(challengeResponse);
-		Event event_update = events[0];
-		event_update.setTitle("title_text_UPDATED");
-		request.setEntity(gson.toJson(event_update, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Event e = eventModification.apply(events[0]);
+		request.setEntity(gson.toJson(e, Event.class), MediaType.APPLICATION_JSON);
+
+		return  client.handle(request);
+	}
+
+	@Test
+	/* update event: all parameters are valid  ---> 200 OK */
+	public void testPut1() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+//		Request request;
+//
+//		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+//				"email_test@gmail.com", "password_test");
+//
+//		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"),
+//				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
+//		event.setOwnerEmail("email_test@gmail.com");
+//		EventsAccessObject.addEvent(event);
+//
+//		request = new Request(Method.GET, url);
+//		Response jsonResponse1 = client.handle(request);
+//		Event[] events = gson.fromJson(jsonResponse1.getEntityAsText(), Event[].class);
+//
+//		request = new Request(Method.PUT, url);
+//		request.setChallengeResponse(challengeResponse);
+//		Event event_update = events[0];
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), "title_text_UPDATED", e.getStartDate(), e.getEndDate(),
+				e.getDescription(),e.getPhotoPath(), e.getOwnerEmail());
+//		event_update.setTitle("title_text_UPDATED");
+//		request.setEntity(gson.toJson(event_update, Event.class), MediaType.APPLICATION_JSON);
+		Response jsonResponse = updateEventToServer(eventModification);
 		
 		assertEquals(200, jsonResponse.getStatus().getCode());
 	}
@@ -234,27 +289,9 @@ class EventsJSONTest {
 	@Test
 	/* update event: invalid id  ---> INVALID_EVENT_ID = 800 */
 	public void testPut2() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
-		Request request;
-						
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC, 
-				"email_test@gmail.com", "password_test");
-		
-		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"), 
-				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
-		event.setOwnerEmail("email_test@gmail.com");
-		EventsAccessObject.addEvent(event);
-		
-		request = new Request(Method.GET, url);
-		Response jsonResponse1 = client.handle(request);
-		Event[] events = gson.fromJson(jsonResponse1.getEntityAsText(), Event[].class);
-		
-		request = new Request(Method.PUT, url);
-		request.setChallengeResponse(challengeResponse);
-		Event event_update = events[0];
-		event_update.setTitle("title_text_UPDATED");
-		event_update.setId(-1);						// the db doesn't contain this id 	
-		request.setEntity(gson.toJson(event_update, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Function<Event, Event> eventModification = (e) -> new Event(-1, "title_text_UPDATED", e.getStartDate(), e.getEndDate(),
+				e.getDescription(),e.getPhotoPath(), e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
 		
 		assertEquals(800, jsonResponse.getStatus().getCode());
 	}
@@ -262,27 +299,9 @@ class EventsJSONTest {
 	@Test
 	/* update event: UNAUTHORIZED_USER = 901 */
 	public void testPut3() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
-		Request request;
-
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
-				"email_test@gmail.com", "password_test");
-		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"),
-				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
-		event.setOwnerEmail("email_test@gmail.com");
-		EventsAccessObject.addEvent(event);
-
-		request = new Request(Method.GET, url);
-		Response jsonResponse1 = client.handle(request);
-		Event[] events = gson.fromJson(jsonResponse1.getEntityAsText(), Event[].class);
-
-		request = new Request(Method.PUT, url);
-		request.setChallengeResponse(challengeResponse);
-		Event event_update = events[0];
-		event_update.setOwnerEmail("email_test_invalid");
-
-		event_update.setTitle("title_text_UPDATED");
-		request.setEntity(gson.toJson(event_update, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), "title_text_UPDATED", e.getStartDate(), e.getEndDate(),
+				e.getDescription(),e.getPhotoPath(), "email_test_invalid");
+		Response jsonResponse = updateEventToServer(eventModification);
 
 		assertEquals(901, jsonResponse.getStatus().getCode());
 	}
@@ -290,33 +309,123 @@ class EventsJSONTest {
 	@Test
 	/* update event: VOID_CLASS_FIELD = 950 */
 	public void testPut4() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
-		Request request;
-
-		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
-				"email_test@gmail.com", "password_test");
-		Event event = new Event("title_test", Event.DATETIME_SDF.parse("2020-01-18 19:26:00"),
-				Event.DATETIME_SDF.parse("2020-01-24 10:26:00"), "description_test");
-		event.setOwnerEmail("email_test@gmail.com");
-		EventsAccessObject.addEvent(event);
-
-		request = new Request(Method.GET, url);
-		Response jsonResponse1 = client.handle(request);
-		Event[] events = gson.fromJson(jsonResponse1.getEntityAsText(), Event[].class);
-
-		request = new Request(Method.PUT, url);
-		request.setChallengeResponse(challengeResponse);
-		Event event_update = events[0];
-		event_update.setTitle("");
-
-		request.setEntity(gson.toJson(event_update, Event.class), MediaType.APPLICATION_JSON);
-		Response jsonResponse = client.handle(request);
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), "", e.getStartDate(), e.getEndDate(),
+				e.getDescription(),e.getPhotoPath(), e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
 
 		assertEquals(950, jsonResponse.getStatus().getCode());
 	}
 
 	@Test
+	/* update event: title length > 80 VOID CLASS FIELD = 950 */
+	public void testPut5() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(),
+				"title_length_is_greater_than_eighty_characters_" +
+						"title_length_is_greater_than_eighty_characters", e.getStartDate(), e.getEndDate(),
+				e.getDescription(),e.getPhotoPath(), e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: startDate equals null VOID CLASS FIELD = 950 */
+	public void testPut6() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), null, e.getEndDate(),
+				e.getDescription(),e.getPhotoPath(), e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: endDate equals null VOID CLASS FIELD = 950 */
+	public void testPut7() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), e.getStartDate(), null,
+				e.getDescription(),e.getPhotoPath(), e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: description empty VOID CLASS FIELD = 950 */
+	public void testPut8() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), e.getStartDate(), e.getEndDate(),
+				"",e.getPhotoPath(), e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: description equals null VOID CLASS FIELD = 950 */
+	public void testPut9() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), e.getStartDate(), e.getEndDate(),
+				null,e.getPhotoPath(), e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: description length > 200 VOID CLASS FIELD = 950 */
+	public void testPut10() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), e.getStartDate(), e.getEndDate(),
+				"description_length_is_greater_than_two_hundred_characters_" +
+						"description_length_is_greater_than_two_hundred_characters_" +
+						"description_length_is_greater_than_two_hundred_characters_" +
+						"description_length_is_greater_than_two_hundred_characters_",e.getPhotoPath(), e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: photoPath !equals null VOID CLASS FIELD = 950 */
+	public void testPut11() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), e.getStartDate(), e.getEndDate(),
+				e.getDescription(), "photo_path_test", e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(200, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: photoPath empty VOID CLASS FIELD = 950 */
+	public void testPut12() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), e.getStartDate(), e.getEndDate(),
+				e.getDescription(), "", e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: photoPath length > 80 VOID CLASS FIELD = 950 */
+	public void testPut13() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), e.getStartDate(), e.getEndDate(),
+				e.getDescription(),
+				"photo_path_greater_than_eighty_characters_photo_path_greater_than_eighty_characters_" +
+						"over", e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
+	/* update event: photoPath empty VOID CLASS FIELD = 950 */
+	public void testPut14() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException {
+		Function<Event, Event> eventModification = (e) -> new Event(e.getId(), e.getTitle(), e.getStartDate(), e.getEndDate(),
+				e.getDescription(), null, e.getOwnerEmail());
+		Response jsonResponse = updateEventToServer(eventModification);
+
+		assertEquals(200, jsonResponse.getStatus().getCode());
+	}
+
+	@Test
 	/*  delete EventsRegistry's DB ---> GENERIC_SQL = 951 */
-	public void testPut5() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException, SQLException {
+	public void testPut20() throws ParseException, InvalidEventIdException, VoidClassFieldException, GenericSQLException, SQLException {
 		Request request;
 
 		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,

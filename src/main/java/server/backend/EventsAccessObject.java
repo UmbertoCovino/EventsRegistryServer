@@ -208,35 +208,35 @@ public class EventsAccessObject {
 		return ownerEmail;
 	}
 
-	public synchronized static User getEventOwner(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
-		User owner = null;
-
-		if (id < 0)
-			throw new VoidClassFieldException("The id passed cannot be < 0.");
-
-		try {
-			ResultSet rs = DBManager.executeQuery("select user_owner_email from events where id = " + id + ";");
-
-			if (rs.next()) {
-				String ownerEmail = rs.getString("user_owner_email");
-
-				try {
-					owner = UsersAccessObject.getUser(ownerEmail);
-				} catch (InvalidUserEmailException e) {
-					owner = null;
-				} catch (VoidClassFieldException e) {
-					owner = null;
-				}
-			} else
-				throw new InvalidEventIdException("Inexistent event id: " + id);
-
-			rs.close();
-		} catch (SQLException e) {
-			throw new GenericSQLException(e.getMessage());
-		}
-
-		return owner;
-	}
+//	public synchronized static User getEventOwner(int id) throws InvalidEventIdException, GenericSQLException, VoidClassFieldException {
+//		User owner = null;
+//
+//		if (id < 0)
+//			throw new VoidClassFieldException("The id passed cannot be < 0.");
+//
+//		try {
+//			ResultSet rs = DBManager.executeQuery("select user_owner_email from events where id = " + id + ";");
+//
+//			if (rs.next()) {
+//				String ownerEmail = rs.getString("user_owner_email");
+//
+//				try {
+//					owner = UsersAccessObject.getUser(ownerEmail);
+//				} catch (InvalidUserEmailException e) {
+//					owner = null;
+//				} catch (VoidClassFieldException e) {
+//					owner = null;
+//				}
+//			} else
+//				throw new InvalidEventIdException("Inexistent event id: " + id);
+//
+//			rs.close();
+//		} catch (SQLException e) {
+//			throw new GenericSQLException(e.getMessage());
+//		}
+//
+//		return owner;
+//	}
 	
 	public synchronized static ArrayList<User> getEventSubscribers(int id) throws GenericSQLException, InvalidEventIdException, VoidClassFieldException {
 		ArrayList<User> users = new ArrayList<>();

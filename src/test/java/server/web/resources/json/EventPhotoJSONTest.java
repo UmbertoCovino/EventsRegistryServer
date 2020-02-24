@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.google.gson.Gson;
 import commons.Event;
 import commons.User;
+import commons.exceptions.ErrorCodes;
 import commons.exceptions.GenericSQLException;
 import commons.exceptions.InvalidEventIdException;
 import commons.exceptions.VoidClassFieldException;
@@ -139,6 +140,16 @@ class EventPhotoJSONTest {
 		assertEquals(204, jsonResponse.getStatus().getCode());
 	}
 
+	@Test
+	/* eventId < 0 */
+	public void testGet3() throws IOException {
+		Request request = new Request(Method.GET, url + "/" + -1 + "/photo");
+
+		Response jsonResponse = client.handle(request);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
 	/////////////////////////////////////////////PUT///////////////////////////////////////////////
 
 //	@Test
@@ -173,4 +184,17 @@ class EventPhotoJSONTest {
 //
 //		Assertions.assertEquals(415, response.getStatus().getCode());
 //	}
+
+	//////////////////////////////////DELETE//////////////////////////////////////////
+
+	@Test
+	/* delete invalid id < 0*/
+	public void testDelete1() throws IOException {
+		Request request = new Request(Method.GET, url + "/" + -1 + "/photo");
+
+		Response jsonResponse = client.handle(request);
+
+		assertEquals(ErrorCodes.VOID_CLASS_FIELD, jsonResponse.getStatus().getCode());
+	}
+
 }

@@ -96,4 +96,5 @@ class EventsBeforeDateJSONTest {
 		assertEquals(ErrorCodes.GENERIC_SQL, jsonResponse.getStatus().getCode());
         DBManager.createDB();
     }
+
 }

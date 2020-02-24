@@ -123,6 +123,16 @@ public class EventJSONTest {
         Assertions.assertEquals(ErrorCodes.INVALID_EVENT_ID, response.getStatus().getCode());
     }
 
+    @Test
+    /* INVALID EVENT ID */
+    public void get3(){
+        String URI = url  + "/" + "-1";
+        Request request = new Request(Method.GET, URI);
+        Response response = client.handle(request);
+
+        Assertions.assertEquals(ErrorCodes.VOID_CLASS_FIELD, response.getStatus().getCode());
+    }
+
     //////////////////////////////////////DELETE/////////////////////////////////////////////////
 
     @Test

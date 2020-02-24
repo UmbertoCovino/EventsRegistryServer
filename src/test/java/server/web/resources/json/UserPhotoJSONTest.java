@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import commons.exceptions.ErrorCodes;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.*;
 import org.restlet.Client;
@@ -157,6 +158,22 @@ class UserPhotoJSONTest {
 		Response response = client.handle(request);
 
 		Assertions.assertEquals(415, response.getStatus().getCode());
+	}
+
+	@Test
+	/* user passed with guard -> email_passed != email_user ---> UNAUTHORIZED_USER = 901*/
+	public void put0() throws ResourceException, IOException {
+		ChallengeResponse challengeResponse = new ChallengeResponse(ChallengeScheme.HTTP_BASIC,
+				email1, "password_test");
+		String URI = url  + "/" + email3 + "/photo";
+		Request request = new Request(Method.PUT, URI);
+		FileRepresentation payload = new FileRepresentation(source,
+				MediaType.IMAGE_JPEG);
+		request.setEntity(payload);
+		request.setChallengeResponse(challengeResponse);
+		Response response = client.handle(request);
+
+		Assertions.assertEquals(ErrorCodes.UNAUTHORIZED_USER, response.getStatus().getCode());
 	}
 
 //	public void deleteFile(String path) throws IOException {

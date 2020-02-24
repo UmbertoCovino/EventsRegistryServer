@@ -161,19 +161,12 @@
 					</execution>
 				</executions>
 				<configuration>
+					<configLocation>
+						${project.basedir}/checkstyle_rules.xml
+					</configLocation>
 					<logViolationsToConsole>true</logViolationsToConsole>
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>false</failsOnError>
-					<checkstyleRules>
-						<module name="Checker">
-							<!-- Checks for Size Violations.                    -->
-							<!-- See http://checkstyle.sf.net/config_sizes.html -->
-							<module name="FileLength">
-								<property name="max" value="3500" />
-								<property name="fileExtensions" value="java" />
-							</module>
-						</module>
-					</checkstyleRules>
 				</configuration>
 			</plugin>
 
@@ -195,7 +188,7 @@
 				<!-- common configuration shared by all executions -->
 				<configuration>
 					<driver>com.mysql.jdbc.Driver</driver>
-					<url>jdbc:mysql://localhost:3306/</url>
+					<url>jdbc:mysql://localhost:3306/?serverTimezone=UTC</url>
 					<username>root</username>
 					<password></password>
 				</configuration>
